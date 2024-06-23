@@ -1,0 +1,1 @@
+export const getMenuItemByPath = (menu, path) => menu.find(item => item.path === path);

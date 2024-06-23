@@ -1,0 +1,32 @@
+{
+  "name": "template",
+  "workspaces": [
+    "packages/*"
+  ],
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons": "^0.0.11",
+    "@element-plus/icons-vue": "^2.3.1",
+    "@vueuse/core": "^10.9.0",
+    "dayjs": "^1.11.11",
+    "element-plus": "^2.7.3",
+    "sass": "^1.77.2",
+    "sass-loader": "^14.2.1",
+    "vue": "^3.4.27",
+    "vue-router": "^4.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "unplugin-turbo-console": "^1.8.6",
+    "vite": "^5.2.11",
+    "vite-plugin-progress": "^0.0.7"
+  }
+}

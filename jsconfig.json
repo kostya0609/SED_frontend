@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@/plugins/*": ["./plugins/*"],
+      "@/*": ["./src/*"],
+      "@common/*": ["./src/common/*"],
+      "@documents/*": ["./src/documents/*"],
+      "@document-routes/*": ["./src/document-routes/*"],
+      "@report/*": ["./src/report/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

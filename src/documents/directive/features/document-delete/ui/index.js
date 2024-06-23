@@ -1,0 +1,1 @@
+export { default as DocumentDeleteButton } from './DocumentDeleteButton.vue';

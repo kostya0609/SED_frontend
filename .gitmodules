@@ -1,0 +1,15 @@
+[submodule "plugins/access"]
+	path = plugins/access
+	url = https://gitlab.bitrix.bsi.local/common/plugin_access.git
+[submodule "plugins/process"]
+	path = plugins/process
+	url = https://gitlab.bitrix.bsi.local/common/plugin_process.git
+[submodule "plugins/menu"]
+	path = plugins/menu
+	url = https://gitlab.bitrix.bsi.local/common/plugin_menu.git
+[submodule "plugins/roles"]
+	path = plugins/roles
+	url = https://gitlab.bitrix.bsi.local/common/plugin_roles.git
+[submodule "plugins/vdg3"]
+	path = plugins/vdg3
+	url = https://gitlab.bitrix.bsi.local/common/plugin_vdg3.git

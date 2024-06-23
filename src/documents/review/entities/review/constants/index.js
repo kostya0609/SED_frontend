@@ -1,0 +1,6 @@
+export const DOCUMENT_STATUS = {
+	PREPARATION: 1,
+    REVIEW: 2,
+    ARCHIVE_WORKED: 3,
+	ARCHIVE_CANCELLED: 4,
+};
