@@ -1,6 +1,5 @@
 <template>
 	<Process
-		ref="refInteraction"
 		@created="onCreated"
 		@deleted="onDeleted"
 		@runned="onRunned"
@@ -8,26 +7,27 @@
 		@completed="onCompleted"
 		@executorCancelled="onExecutorCancelled"
 		@participantCancelled="onParticipantCancelled"
+		v-slot:head
 	>
-		<template #head="process">
-			{{ document.number }}
-		</template>
+		{{ document.number }}
 	</Process>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { inject } from 'vue';
 import { TEMPLATE_ACTION } from "@/plugins/process/constants";
-import { useActiveTab, useDocument } from "@/documents/esz/entities/esz";
+import { useActiveTab, useDocument } from "@documents/esz/entities/esz";
+import { DOCUMENT_STATUS } from '@documents/esz/entities/esz/constants';
 
 defineProps({
 	document: Object,
 });
 
 const { setActiveTab } = useActiveTab();
-const { updateDocument } = useDocument();
+const { updateDocument, checkDocumentStatus } = useDocument();
 
-const refInteraction = ref();
+const interactionRef = inject('interactionRef');
+const processRef = inject('processRef');
 
 
 /**
@@ -61,7 +61,7 @@ const onDecided = async (action) => {
 		action.template_action_id === TEMPLATE_ACTION.MAKE_COMMENT_AND_NOTIFY_EXECUTOR_DOCUMENT) {
 
 		setActiveTab('interaction');
-		await refInteraction.value.updateComments();
+		await interactionRef.value.updateComments();
 	}
 };
 
@@ -76,14 +76,26 @@ const onCompleted = async () => {
  * Обработка события: Аннулирование бизнес-процесса
  */
 const onExecutorCancelled = async () => {
-	await updateDocument();
+	if (!checkDocumentStatus(DOCUMENT_STATUS.COORDINATION)) {
+		// TODO: Исправить баг с обновлением процесса
+		location.reload();
+		// processRef.value.updateProcess();
+	} else {
+		await updateDocument();
+	}
 };
 
 /**
  * Обработка события: Отрицательном решении бизнес-процесса
  */
 const onParticipantCancelled = async () => {
-	await updateDocument();
+	if (!checkDocumentStatus(DOCUMENT_STATUS.COORDINATION)) {
+		// TODO: Исправить баг с обновлением процесса
+		location.reload();
+		// processRef.value.updateProcess();
+	} else {
+		await updateDocument();
+	}
 };
 </script>
 

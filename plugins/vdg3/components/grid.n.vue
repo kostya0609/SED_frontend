@@ -3,7 +3,7 @@ import Column from '@/plugins/vdg3/components/column.vue';
 import HeaderRow from '@/plugins/vdg3/components/header.vue';
 import Filterable from '@/plugins/vdg3/components/filterable.vue';
 import {Fragment, h, Teleport, inject, resolveComponent} from 'vue';
-import {useGrids } from '../';
+import {useGrids, useGridsData } from '../';
 
 export default {
     name : 'Grid',
@@ -13,6 +13,7 @@ export default {
     setup(props, context){
         //let grid = inject(props.name);
         const { instanceGrids } = useGrids();
+        const {gridsData} = useGridsData();
         let grid = instanceGrids[props.name];
 
         async function getGridData(){
@@ -32,13 +33,12 @@ export default {
             if (result.status == 'success'){
                 for (const [key, value] of Object.entries(result.data)) {
                     
-                    if (!(key in grid.header)) {
-                        throw new Error(`Свойства ${key} нет в объекте grid.header!`);
+                    if ((key in grid.header)) {
+                        grid.header[key].show = value.show;
+                        grid.header[key].sort = value.sort;
+                        grid.header[key].width = value.width;
                     }
 
-                    grid.header[key].show = value.show;
-                    grid.header[key].sort = value.sort;
-                    grid.header[key].width = value.width;
                 }
             }
 
@@ -54,7 +54,8 @@ export default {
                     result.data[key].query ? result.data[key].query = eval('(' + result.data[key].query + ')') : '';
                     result.data[key].focus ? result.data[key].focus = eval('(' + result.data[key].focus + ')') : '';
                 }
-                defaultFilterData = result.data;
+                defaultFilterData = {...result.data, ...gridsData[props.name].filterData};
+                
                 grid.methods.normalizeFilterData(defaultFilterData);
             }
 

@@ -8,7 +8,7 @@
 </template>
 <script setup>
 
-import { onMounted, ref } from 'vue';
+import { onMounted, ref} from 'vue';
 import { Menu } from '@/plugins/menu';
 import { useUser } from "@/common/app/composables";
 import { RouterView } from '@/common/app/providers';

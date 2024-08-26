@@ -1,11 +1,3 @@
 <template>
-  AdditionalInfo
+	<el-empty />
 </template>
-
-<script setup>
-
-</script>
-
-<style scoped>
-
-</style>

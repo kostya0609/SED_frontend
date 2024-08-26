@@ -11,7 +11,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { createDocumentLink } from '@documents';
-import { useDocument } from '@/documents/directive/entities/directive';
+import { useDocument } from '@documents/directive/entities/directive';
 
 const router = useRouter();
 const {document} = useDocument();

@@ -1,6 +1,5 @@
-import { reactive, ref } from "vue";
+import { reactive } from "vue";
 import { notify } from "@common/shared/utils";
-import { useAccessRepo } from "@/plugins/access/repositories";
 import { InitRepo } from "@/common/shared/api";
 
 const user = reactive({
@@ -64,7 +63,6 @@ export const useUser = () => {
 	 * @returns {string[]} Возвращает массив прав доступа
 	 */
 	const getRights = () => {
-		checkUserObject();
 		return user.rights;
 	};
 
@@ -74,9 +72,7 @@ export const useUser = () => {
 	 * @param {string[]|string} rights
 	 * @returns {boolean}
 	 */
-	const can = (rights) => {
-		checkUserObject();
-
+	const checkUserRights = (rights) => {
 		if (typeof rights === 'string') {
 			return user.rights.includes(rights);
 		} else if (Array.isArray(rights)) {
@@ -94,7 +90,7 @@ export const useUser = () => {
 
 	return {
 		user,
-		can,
+		checkUserRights,
 		initUser,
 		getUserId,
 		getRights,

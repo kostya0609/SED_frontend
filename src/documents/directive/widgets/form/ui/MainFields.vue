@@ -52,10 +52,9 @@
 		class="form__item"
 		prop="creator"
 	>
-		<SearchUser
-			disabled
+		<SearchUserExtra
 			v-model="formData.creator"
-			:options="defaultValues.creator"
+			disabled
 		/>
 	</el-form-item>
 
@@ -64,42 +63,38 @@
 		class="form__item"
 		prop="author"
 	>
-		<SearchUser
-			v-model="formData.author"
-			:options="defaultValues.author"
+		<SearchUserExtra
+			v-model="formData.author"			
 		/>
 	</el-form-item>
 
 	<el-form-item
-		label="Исполнители:"
+		label="Исполнитель:"
 		class="form__item"
 		prop="executors"
 	>
-		<SearchUser
+		<SearchUserExtra
 			v-model="formData.executors"
-			:options="defaultValues.executors"
 			multiple
 		/>
 	</el-form-item>
 
 	<el-form-item
-		label="Контроллеры:"
+		label="Контроллер:"
 		class="form__item"
 	>
-		<SearchUser
+		<SearchUserExtra
 			v-model="formData.controllers"
-			:options="defaultValues.controllers"
 			multiple
 		/>
 	</el-form-item>
 
 	<el-form-item
-		label="Наблюдатели:"
+		label="Наблюдатель:"
 		class="form__item"
 	>
-		<SearchUser
+		<SearchUserExtra
 			v-model="formData.observers"
-			:options="defaultValues.observers"
 			multiple
 		/>
 	</el-form-item>
@@ -108,7 +103,7 @@
 
 <script setup>
 
-import { SearchUser, SearchTheme } from "@common/shared/ui";
+import { SearchTheme, SearchUserExtra } from "@common/shared/ui";
 
 defineProps({
 	formData: Object,

@@ -13,6 +13,10 @@ export const getFormDataFile = (document_id, files, type) => {
 
     formData.append('document_id', document_id);
 
+	if (!files.length) {
+		formData.append(`data[${type}]`, '');
+	}
+
     for(let i = 0; i < files.length; i++){
         formData.append(`data[${type}][${i}][${files[i].id ? 'id' : 'raw'}]`, files[i].id ? files[i].id : files[i].raw);
     }

@@ -11,7 +11,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { createDocumentLink } from '@documents';
-import { useDocument } from '@/documents/esz/entities/esz';
+import { useDocument } from '@documents/esz/entities/esz';
 
 const router = useRouter();
 const {document} = useDocument();

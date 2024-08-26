@@ -1,0 +1,1 @@
+export { default as DepartmentTree } from './DepartmentTree.vue';

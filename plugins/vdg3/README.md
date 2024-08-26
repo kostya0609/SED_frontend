@@ -206,7 +206,7 @@ const router = useRouter();
 
 const { updateGrid, resetGrid, instanceGrids } = useGrids();
 
-const gridName = 'documentsList';
+const = 'documentsList';
 const loading = computed(() => { return instanceGrids[gridName].loading });
 
 // ниже описание логики действия при нажатии на пункт контекстного меню
@@ -347,10 +347,14 @@ onUnmounted(()=>{
         },
   
       };
-      let result = await loadJson('/grid/filter/preset/default/add', {
-        grid_name: name.value,
-        module: dataGrid.networkSetting.module,
-        data: {...defaultFilterData},
+      await fetch('http://localhost/grid/filter/preset/default/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            grid_name: gridName,
+            module: 'SED',
+            data: { ...defaultFilterData },
+        })
       });
       notify('Загрузка дефолтового фильтра', result.message, result.status)
     }

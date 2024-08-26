@@ -7,6 +7,12 @@ import UserLink from './UserLink.vue';
 import SearchTheme from './SearchTheme.vue'
 import DocumentHistory from './DocumentHistory.vue';
 import ProcessHistory from './ProcessHistory.vue';
+import SearchStaticRole from './SearchStaticRole.vue';
+import SearchUserExtra from './SearchUserExtra.vue';
+import FileLink from './FileLink.vue';
+import ParticipantList from './ParticipantList.vue';
+import AttachmentList from './AttachmentList.vue';
+import ParticipantListDocTmp from './ParticipantListDocTmp.vue'
 
 export {
 	Preloader,
@@ -17,5 +23,11 @@ export {
 	UserLink,
 	SearchTheme,
 	DocumentHistory,
-	ProcessHistory
+	ProcessHistory,
+	SearchStaticRole,
+	SearchUserExtra,
+	FileLink,
+	ParticipantList,
+	AttachmentList,
+	ParticipantListDocTmp
 };

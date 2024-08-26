@@ -25,8 +25,13 @@ export class ReviewRepository extends BaseRepository {
             payload,
             nestedEndpoint: 'get'
         });
-        if (!result.success)
-            throw new Error(result.message);
+        if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
 
         return result.data;
     }
@@ -36,7 +41,7 @@ export class ReviewRepository extends BaseRepository {
      * @param {{
      *  theme_id: number,
      *  content: string,
-     *  responsible_id: number,
+     *  initiator_id: number,
      *  receivers: number[]
      * }} payload
      * @return {Promise<any>}
@@ -46,8 +51,13 @@ export class ReviewRepository extends BaseRepository {
             payload,
             nestedEndpoint: 'create'
         });
-        if (!result.success)
-            throw new Error(result.message);
+        if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
 
         return result.data;
     }
@@ -58,7 +68,7 @@ export class ReviewRepository extends BaseRepository {
      * id: number,
      *  theme_id: number,
      *  content: string,
-     *  responsible_id: number,
+     *  initiator_id: number,
      *  receivers: number[]
      * }} payload
      * @return {Promise<any>}
@@ -68,8 +78,13 @@ export class ReviewRepository extends BaseRepository {
             payload,
             nestedEndpoint: 'update'
         });
-        if (!result.success)
-            throw new Error(result.message);
+        if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
 
         return result.data;
     }
@@ -83,9 +98,13 @@ export class ReviewRepository extends BaseRepository {
             payload,
             nestedEndpoint: 'delete'
         });
-        if (!result.success)
-            throw new Error(result.message);
+        if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
 
+			throw new Error(result.message);
+		}
         return result.data;
     }
 
@@ -98,8 +117,13 @@ export class ReviewRepository extends BaseRepository {
                 payload,
                 nestedEndpoint: 'cancel'
             });
-            if (!result.success)
+            if (!result.success) {
+                if (result.errors) {
+                    throw new Error(Object.values(result.errors).join('\n'));
+                }
+    
                 throw new Error(result.message);
+            }
     
             return result.data;
         }
@@ -114,11 +138,37 @@ export class ReviewRepository extends BaseRepository {
             nestedEndpoint: 'upload-files',
         });
         
-        if (!result.success)
-            throw new Error(result.message);
+        if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
 
         return result.data;
     }
+
+    /**
+	 * @param {number} documentId 
+	 * @returns {Promise<void>}
+	 */
+	async sendToApproval(documentId) {
+		const result = await this._query({
+			payload: { document_id: documentId },
+			nestedEndpoint: 'send-to-approval',
+		});
+
+		if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
+
+		return result.data;
+	}
 
 
 }

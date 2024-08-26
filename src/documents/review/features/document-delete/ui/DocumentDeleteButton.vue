@@ -27,7 +27,7 @@ const handleClick = () => {
 	ElMessageBox.confirm('Вы уверены, что хотите удалить документ?', {
 		type: 'warning',
 		callback: async (action) => {
-			if (action === 'cancel') {
+			if (action !== 'confirm') {
 				return;
 			}
 

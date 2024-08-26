@@ -60,13 +60,25 @@ export const adminMenu = [
 
 	{
 		title: 'Маршруты',
-		path: '/sed/admin/document-routes',
+		path: '/sed/admin/document-routes/list',
 		rights: ['full_access'],
 		buttons: [
 			{
 				title: 'Создать маршрут',
-				path: '/sed/',
+				path: '/sed/admin/document-routes/create',
 			},
+			{
+				icon: 'Back',
+				path: '/sed/',
+				type: 'default'
+			},
+		],
+	},
+	{
+		title: 'Структура маршрутов',
+		path: '/sed/admin/document-routes/partition/tree',
+		
+		buttons: [
 			{
 				icon: 'Back',
 				path: '/sed/',
@@ -109,17 +121,6 @@ export const adminMenu = [
 		path: '/sed/admin/access/group/list',
 		replaceMenu: accessMenu,
 	},
-	{
-		title: 'Структура маршрутов',
-		path: '/sed/admin/document-routes/structure',
-		buttons: [
-			{
-				icon: 'Back',
-				path: '/sed/',
-				type: 'default'
-			},
-		],
-	},
 
 ];
 
@@ -151,7 +152,7 @@ export const menu = [
 	},
 	{
 		title: 'Администрирование',
-		path: '/sed/admin/document-routes',
+		path: '/sed/admin/document-routes/list',
 		rights: ['full_access'],
 		replaceMenu: adminMenu,
 	},

@@ -1,5 +1,6 @@
 <template>
   <el-select
+    v-model="users"
     :class="['width-full']"
     filterable
     remote
@@ -9,39 +10,48 @@
     clearable
     :loading="loading"
     value-key="id"
+    collapse-tags
+    :multiple
+    @blur="userList = multiple ? users : users ? [users] : []"  
   >
+  
     <el-option
-      v-for="item in users"
+      v-for="item in userList"
       :key="item.id"
       :label="item.full_name"
       :value="item"
     />
   </el-select>
-
 </template>
+
 <script setup>
 import { ref } from 'vue';
 import { UserRepo } from '@common/shared/api/index.js';
 import { notify } from '@common/shared/utils';
 
+const users = defineModel();
+
 const props = defineProps({
   options: {
     type: Array,
     default: [],
+  },
+  multiple: {
+    type: Boolean,
+    default: false,
   }
-})
+});
 
-const users = ref(props.options);
+const userList = ref(props.options);
 const loading = ref(false);
 
 const search = async (query) => {
-  if (!query) return;
+  if (!query.trim()) return;
 
   try {
     loading.value = true;
-    const result = await UserRepo.search(query);
 
-    users.value = result;
+    userList.value = await UserRepo.search(query.trim());
 
   } catch (e) {
     notify.error(e.message);

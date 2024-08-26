@@ -1,8 +1,8 @@
 <template>
 	<el-result
 		icon="warning"
-		:title="`Ведутся технические работы в модуле бизнес-процессов до ${closeTechnicalWork.process.finishedAt} по Хабаровскому времени`"
-		v-if="closeTechnicalWork.process.enable"
+		:title="SETTINGS.CLOSE_TECHNICAL_WORK.value"
+		v-if="SETTINGS.CLOSE_TECHNICAL_WORK.is_active"
 	/>
 	<ActiveProcess v-else>
 		<template v-slot:head="process">
@@ -16,9 +16,11 @@
 <script setup>
 import ActiveProcess from '@/plugins/process/components/process/active-process/ActiveProcess.vue';
 import { inject } from 'vue';
+import { useSetting } from '@/plugins/process/utils';
+
+const { SETTINGS } = useSetting();
 
 const updateProcess = inject('updateProcess');
-const closeTechnicalWork = inject('closeTechnicalWork');
 
 defineExpose({
 	updateProcess,

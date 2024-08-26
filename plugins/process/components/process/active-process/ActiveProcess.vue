@@ -77,7 +77,14 @@
 	<CompletedProcess
 		:active-process="activeProcess"
 		v-else-if="activeProcess.type === ACTIVE_PROCESS_TYPE.COMPLETED"
-	/>
+	>
+		<template v-slot:head="{ process }">
+			<slot
+				name="head"
+				:process="process.process"
+			/>
+		</template>
+	</CompletedProcess>
 	<NotCreatedProcess v-else-if="activeProcess.type === ACTIVE_PROCESS_TYPE.NOT_CREATED" />
 	<el-alert
 		type="warning"
@@ -99,7 +106,6 @@ import { formatDateTime } from '@/plugins/process/utils';
 
 const activeProcess = inject('activeProcess');
 const useRepo = inject('useRepo');
-const access = inject('access');
 const templateId = inject('templateId');
 const documentId = inject('documentId');
 const isDebug = inject('isDebug');

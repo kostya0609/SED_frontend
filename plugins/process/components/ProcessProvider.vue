@@ -4,11 +4,12 @@
 	</Preloader>
 </template>
 <script setup>
-import { notify } from '@/plugins/process/utils';
-import { computed, inject, provide, ref, watchEffect } from 'vue';
+import { notify, useSetting } from '@/plugins/process/utils';
+import { computed, inject, onMounted, provide, ref, watchEffect } from 'vue';
 import Preloader from '@/plugins/process/components/common/Preloader.vue';
 
 const { ProcessRepo } = inject('useRepo');
+const { initSettings } = useSetting();
 
 const props = defineProps({
 	templateId: Number,
@@ -56,6 +57,10 @@ const updateProcess = async () => {
 
 watchEffect(async () => {
 	await updateProcess();
+});
+
+onMounted(async () => {
+	await initSettings();
 });
 
 provide('activeProcess', activeProcess);

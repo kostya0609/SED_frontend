@@ -9,7 +9,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { ElMessageBox } from 'element-plus';
-import { useDocument } from "@/documents/directive/entities/directive";
+import { useDocument } from "@documents/directive/entities/directive";
 
 const router = useRouter();
 const { remove } = useDocument();
@@ -22,7 +22,7 @@ const handleClick = () => {
 	ElMessageBox.confirm('Вы уверены, что хотите удалить документ?', {
 		type: 'warning',
 		callback: async (action) => {
-			if (action === 'cancel') {
+			if (action !== 'confirm') {
 				return;
 			}
 

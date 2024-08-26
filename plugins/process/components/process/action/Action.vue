@@ -30,6 +30,7 @@
 							:key="action.id"
 							:label="action.title"
 							:value="action.id"
+							:class="action.template_action.is_process_affect ? 'is_process_affect' : ''"
 						/>
 					</el-select>
 				</el-form-item>
@@ -58,6 +59,14 @@
 						v-else-if="data.action.template_action_id === TEMPLATE_ACTION.SKIP"
 						:action="data.action"
 					/>
+					<CustomAction
+						v-else-if="data.action.template_action_id === TEMPLATE_ACTION.CUSTOM"
+						:action="data.action"
+					/>
+					<PostCommentAction
+						v-else-if="data.action.template_action_id === TEMPLATE_ACTION.POST_COMMENT"
+						:action="data.action"
+					/>
 					<el-alert
 						type="error"
 						:closable="false"
@@ -81,6 +90,8 @@ import MakeCommentAndNotifyExecutor from '@/plugins/process/components/process/a
 import MakeCommentAndNotifyExecutorDocument from '@/plugins/process/components/process/action/MakeCommentAndNotifyExecutorDocument.vue';
 import AttractAction from '@/plugins/process/components/process/action/AttractAction.vue';
 import SkipAction from '@/plugins/process/components/process/action/SkipAction.vue';
+import CustomAction from '@/plugins/process/components/process/action/CustomAction.vue';
+import PostCommentAction from '@/plugins/process/components/process/action/PostCommentAction.vue';
 
 const { ParticipantRepo } = inject('useRepo');
 const processId = inject('processId');
@@ -204,5 +215,9 @@ provide('actionEmitter', actionEmitter);
 	&__select {
 		width: 100%;
 	}
+}
+
+.el-select-dropdown__item.is-hovering.is_process_affect {
+	background-color: rgb(230, 255, 230);
 }
 </style>

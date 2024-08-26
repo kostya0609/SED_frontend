@@ -23,112 +23,107 @@ export const useGrids = () => {
 
     initData.forEach(data => {
 
-      const defaultContent = {
-        setting: true,
-        header: {},
-        context: [],
-        pagination: {
-          show: 'full',
-          defaultSize: gridsData[data.name].paginationData.count,
-          page: gridsData[data.name].paginationData.page,
-          changeSize: function (value) {
-            gridsData[data.name].paginationData.count = value;
-            updateGrid(data.name, true);
+      instanceGrids[data.name] = initGrid(
+        {
+          setting: true,
+          header: {...data.header},
+          context: data.context,
+          pagination: {
+            show: 'full',
+            defaultSize: gridsData[data.name].paginationData.count,
+            page: gridsData[data.name].paginationData.page,
+            changeSize: function (value) {
+              gridsData[data.name].paginationData.count = value;
+              updateGrid(data.name, true);
+            },
+            changePage: function (value) {
+              gridsData[data.name].paginationData.page = value;
+              updateGrid(data.name, true);
+            },
+            ...data.pagination,
           },
-          changePage: function (value) {
-            gridsData[data.name].paginationData.page = value;
-            updateGrid(data.name, true);
-          }
-        },
-        filter: {
-          profiles: [],
-          show: true,
-          showProfiles: true,
-          showValue: gridsData[data.name].showValueFilter,
-          activeProfile: gridsData[data.name].activeProfile,
-          filter: function (filterData_new, showValueFilter_new, activeProfile_new) {
-            for (let prop of Object.getOwnPropertyNames(gridsData[data.name].filterData)) {
-              delete gridsData[data.name].filterData[prop];
-            }
-            let normalFilter = {};
-            for (let key in filterData_new) {
-              if ((filterData_new[key].type === 'number' || filterData_new[key].type === 'date') && filterData_new[key].min) normalFilter[key] = filterData_new[key];
-              if ((filterData_new[key].type === 'list' || filterData_new[key].type === 'searchList') && filterData_new[key].value.length > 0) normalFilter[key] = filterData_new[key];
-            }
-            ;
+          filter: {
+            profiles: [],
+            show: true,
+            showProfiles: true,
+            showValue: gridsData[data.name].showValueFilter,
+            activeProfile: gridsData[data.name].activeProfile,
+            filter: function (filterData_new, showValueFilter_new, activeProfile_new) {
+              for (let prop of Object.getOwnPropertyNames(gridsData[data.name].filterData)) {
+                delete gridsData[data.name].filterData[prop];
+              }
+              let normalFilter = {};
+              for (let key in filterData_new) {
+                if ((filterData_new[key].type === 'number' || filterData_new[key].type === 'date') && filterData_new[key].min) normalFilter[key] = filterData_new[key];
+                if ((filterData_new[key].type === 'list' || filterData_new[key].type === 'searchList') && filterData_new[key].value.length > 0) normalFilter[key] = filterData_new[key];
+              }
+                
+              gridsData[data.name].showValueFilter = showValueFilter_new;
+  
+              Object.assign(gridsData[data.name].filterData, {...normalFilter});
+             
+              gridsData[data.name].activeProfile = activeProfile_new.value;
+              updateGrid(data.name, true);
+            },
+            clear: function () {
+              for (let prop of Object.getOwnPropertyNames(gridsData[data.name].filterData)) {
+                delete gridsData[data.name].filterData[prop];
+              };
 
-            gridsData[data.name].showValueFilter = showValueFilter_new;
-
-            Object.assign(gridsData[data.name].filterData, normalFilter);
-            gridsData[data.name].activeProfile = activeProfile_new.value;
-            updateGrid(data.name, true);
+              gridsData[data.name].activeProfile = null;
+              updateGrid(data.name, true);
+            },
+            ...data.filter,          },
+          gridId: null,
+          networkSetting: {
+            domain: process.env.NODE_ENV == 'production' ?
+              API.PROD_URL ? API.PROD_URL : `${window.location.origin}/api`
+              :
+              API.DEV_URL ? API.DEV_URL : 'http://localhost',
+            module,
+            userId: window._userId ?? userId,
           },
-          clear: function (data) {
-            for (let prop of Object.getOwnPropertyNames(gridsData[data.name].filterData)) {
-              delete gridsData[data.name].filterData[prop];
-            }
-            ;
-            gridsData[data.name].activeProfile = null;
-            updateGrid(data.name, true);
-          },
-        },
-        gridId: null,
-        networkSetting: {
-          domain: process.env.NODE_ENV == 'production' ?
-            API.PROD_URL ? API.PROD_URL : `${window.location.origin}/api`
-            :
-            API.DEV_URL ? API.DEV_URL : 'http://localhost',
-          module,
-          userId: window._userId ?? userId,
-        },
-        loading: false,
-        loadJson: function (url, data) {
-          return fetch(
-            defaultContent.networkSetting.domain + url,
-            {
-              method: 'post',
-              headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-              },
-              body: JSON.stringify(data, function (key, val) {
-                return (typeof val === 'function') ? '' + val : val;
-              })
-            }
-          ).then(res => {
-            return new Promise((resolve, reject) => {
-              if (!res.ok)
-                throw new Error('Response server - status code ' + res.status);
-              else {
-                res.json().then(json => {
-                  resolve(json)
-                }).catch(err => {
-                  reject(err);
+          loading: false,
+          loadJson: function (url, data) {
+            return fetch(
+              this.networkSetting.domain + url,
+              {
+                method: 'post',
+                headers: {
+                  'Content-Type': 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify(data, function (key, val) {
+                  return (typeof val === 'function') ? '' + val : val;
                 })
               }
-            })
-          }).catch(err => {
-            return new Promise((resolve, reject) => {
-              reject({ status: 'error', message: 'Некорректный ответ сервера', system: err.message })
-            })
-          });
-        },
-        sortContent: function (sortData_new) {
-          Object.assign(gridsData[data.name].sortData, sortData_new);
-          updateGrid(data.name, true);
-        },
-      };
+            ).then(res => {
+              return new Promise((resolve, reject) => {
+                if (!res.ok)
+                  throw new Error('Response server - status code ' + res.status);
+                else {
+                  res.json().then(json => {
+                    resolve(json)
+                  }).catch(err => {
+                    reject(err);
+                  })
+                }
+              })
+            }).catch(err => {
+              return new Promise((resolve, reject) => {
+                reject({ status: 'error', message: 'Некорректный ответ сервера', system: err.message })
+              })
+            });
+          },
+          sortContent: function (sortData_new) {
+            Object.assign(gridsData[data.name].sortData, {...sortData_new});
+            updateGrid(data.name, true);
+          },
+        }
+      );
 
-      defaultContent.header = data.header;
-      defaultContent.context = data.context;
-      defaultContent.pagination = {...defaultContent.pagination, ...data.pagination};
-      defaultContent.filter = {...defaultContent.filter, ...data.filter}
-
-      const instanceGrid = initGrid(defaultContent);
-
-      instanceGrids[data.name] = instanceGrid;
       APIGrids[data.name] = { API, url: data.url ?? '' };
     });
-
+    // console.log('instanceGrids from init', instanceGrids);
   };
 
 
@@ -138,8 +133,8 @@ export const useGrids = () => {
   */
   const updateGrid = async (name, updateLocalStorage) => {
 
-    if (updateLocalStorage) writeGridData()
-    else readGridData(name);
+    // if (updateLocalStorage) writeGridData()
+    // else readGridData(name);
 
     let filter = gridsData[name].filterData;
     let sort = gridsData[name].sortData;
@@ -165,8 +160,8 @@ export const useGrids = () => {
 
       if (result.success && result.data) {
         gridElements = result.data.items;
-        instanceGrids[name].pagination.total = result.data.total;
 
+        instanceGrids[name].pagination.total = result.data.total;
         instanceGrids[name].methods.addElements(gridElements);
       }
       else throw new Error('Произошла ошибка при выполнении запроса не сервере');

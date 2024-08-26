@@ -36,24 +36,22 @@
   <el-form-item
     label="Инициатор:"
     class="form__item"
-    prop="responsible"
+    prop="initiator"
   >
-    <SearchUser
-      v-model="formData.responsible"
-      :options="defaultValues.responsible"
+    <SearchUserExtra
+      v-model="formData.initiator"
       disabled
     />
   </el-form-item>
 
 
   <el-form-item
-    label="Получающие ознакомление:"
+    label="Получающий ознакомление:"
     class="form__item"
     prop="receivers"
-  >
-    <SearchUser
+  >    
+    <SearchUserExtra
       v-model="formData.receivers"
-      :options="defaultValues.receivers"
       multiple
     />
   </el-form-item>
@@ -62,7 +60,7 @@
 
 <script setup>
 
-import { SearchUser, SearchTheme } from "@common/shared/ui";
+import { SearchTheme, SearchUserExtra } from "@common/shared/ui";
 
 defineProps({
   formData: Object,

@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { Form } from '@/documents/review/widgets/form';
+import { Form } from '@documents/review/widgets/form';
 import { useBackButton } from '@/plugins/menu';
 
 useBackButton({ fallbackPath: '/sed' });

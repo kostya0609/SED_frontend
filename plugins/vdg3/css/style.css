@@ -318,8 +318,8 @@ span.vdg_valueFilter {
 }
 
 .vdg_filterMainContainer_scrollbar{
-    max-height: 350px;
-    min-height: 350px;
+    min-height: 35vh;
+    max-height: 35vh;
 }
 
 .vdg_filterMainContainer{

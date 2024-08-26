@@ -7,39 +7,31 @@ let installed = false;
 
 export default {
 
-    /**
-     * @param {any} app 
-     * @param {{
-     *  API: {
-     *      DEV_URL: string
-     *      PROD_URL: string
-     *  }
-     *  isDebug: boolean
-     *  closeTechnicalWork: {
-     *      process: { enable: boolean, finishedAt: string }
-     *      interaction: { enable: boolean, finishedAt: string }
-     *  }
-     * }} options 
-     * 
-     * @returns {void}
-     */
-    install(app, options = {}) {
-        if (installed) return;
+	/**
+	 * @param {any} app 
+	 * @param {{
+	 *  API: {
+	 *      DEV_URL: string
+	 *      PROD_URL: string
+	 *  }
+	 *  isDebug: boolean
+	 * }} options 
+	 * 
+	 * @returns {void}
+	 */
+	install(app, options = {}) {
+		if (installed) return;
 
-        installed = true;
+		installed = true;
 
-        options.API = options.API || {};
-        options.isDebug = options.isDebug || false;
-        options.closeTechnicalWork = options.closeTechnicalWork || {};
-        options.closeTechnicalWork.process = options.closeTechnicalWork.process || { enable: false };
-        options.closeTechnicalWork.interaction = options.closeTechnicalWork.interaction || { enable: false };
+		options.API = options.API || {};
+		options.isDebug = options.isDebug || false;
 
-        app.component('Process', Process);
-        app.component('Interaction', Interaction);
-        app.component('ProcessProvider', ProcessProvider);
+		app.component('Process', Process);
+		app.component('Interaction', Interaction);
+		app.component('ProcessProvider', ProcessProvider);
 
-        app.provide('useRepo', useInitRepositories(options.API));
-        app.provide('isDebug', options.isDebug);
-        app.provide('closeTechnicalWork', options.closeTechnicalWork);
-    }
+		app.provide('useRepo', useInitRepositories(options.API));
+		app.provide('isDebug', options.isDebug);
+	}
 }

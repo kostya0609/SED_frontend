@@ -1,120 +1,193 @@
 import { BaseRepository } from "@common/shared/api/BaseRepository";
 
 export class ESZRepository extends BaseRepository {
-    constructor() {
-        super();
-        this.setSubmodule('documents/esz');
-    }
+	constructor() {
+		super();
+		this.setSubmodule('documents/esz');
+		this.setEndpoint('esz');
+	}
 
-    /**
-     * @param {string} nestedEndpoint
-     * @returns {module:url.URL}
-     */
-    _buildUrl(nestedEndpoint) {
-        return new URL(`${this._url}/${this._endpoint}/${this._version}` + (nestedEndpoint ? `/${nestedEndpoint}` : ''));
-    }
+	/**
+	 * @param {string} nestedEndpoint
+	 * @returns {module:url.URL}
+	 */
+	_buildUrl(nestedEndpoint) {
+		return new URL(`${this._url}/${this._endpoint}/${this._version}` + (nestedEndpoint ? `/${nestedEndpoint}` : ''));
+	}
 
-    /**
-     * @param {{document_id: number}} payload
-     * @return {Promise<any>}
-     */
-    async getById(payload) {
-        // const result = await this._query({
-        //     payload,
-        //     nestedEndpoint : 'get'
-        // });
-        // if (!result.success)
-        //     throw new Error(result.message);
 
-        // return result.data;
+	/**
+	 * @param {{document_id: number}} payload
+	 * @return {Promise<any>}
+	 */
+	async getById(payload) {
+		const result = await this._query({
+			payload,
+			nestedEndpoint: 'get'
+		});
 
-        return new Promise((resolve, reject) => {
-            resolve({
-                id: 1,
-                process_template_id: 5,
-                number: 'ЭСЗ-(БУХ НОТ)-2024-164551',
-                type: {id: 1, title: 'ЭСЗ'},
-                status: { id: 5, title: 'Создана' },
-                subject: 'Какая-то тема документа',
-                date_created: '2024-03-21 06:54:23',
-                date_execution: '2024-03-25 06:54:23',
-                foundation_document: 'какая-то ссылка на родителя если есть',
-                contents: 'Некое содержание документа',
-                responsible: { id: 1414, full_name: 'Иванов Иван Иванович 1', photo: 'https://bitrix.bsi.local/upload/main/590/DSCN2470.png', link: 'https://bitrix.bsi.local/company/personal/user/5458/' },
-                signatory: { id: 1414, full_name: 'Иванов Иван Иванович 2', photo: 'https://bitrix.bsi.local/upload/main/590/DSCN2470.png', link: 'https://bitrix.bsi.local/company/personal/user/5458/' },
-                receivers: [
-                    { id: 1414, full_name: 'Иванов Иван Иванович 3', photo: 'https://bitrix.bsi.local/upload/main/590/DSCN2470.png', link: 'https://bitrix.bsi.local/company/personal/user/5458/' },
-                ],
-                lookers: [
-                    { id: 1414, full_name: 'Иванов Иван Иванович 4', photo: 'https://bitrix.bsi.local/upload/main/590/DSCN2470.png', link: 'https://bitrix.bsi.local/company/personal/user/5458/' },
-                    { id: 1414, full_name: 'Иванов Иван Иванович 5', photo: 'https://bitrix.bsi.local/upload/main/590/DSCN2470.png', link: 'https://bitrix.bsi.local/company/personal/user/5458/' },
-                ],
-                main_files: [
-                    {
-                        "original_name": "myToken.копия.моя.txt",
-                        "translated_name": "mytokenkopiyamoya",
-                        "hash_name": "c6dd226b479f8c4b6ed988d11ce956b1",
-                        "extension": "txt",
-                        "mime_type": "text/plain",
-                        "size": 40,
-                        "updated_at": "2024-03-22T01:01:33.000000Z",
-                        "created_at": "2024-03-22T01:01:33.000000Z",
-                        "id": 2,
-                        "path": "/var/www/html/app/Modules/File/Files/c6dd226b479f8c4b6ed988d11ce956b1"
-                    },
-                    {
-                        "original_name": "myToken.копия.моя.txt",
-                        "translated_name": "mytokenkopiyamoya",
-                        "hash_name": "c6dd226b479f8c4b6ed988d11ce956b1",
-                        "extension": "txt",
-                        "mime_type": "text/plain",
-                        "size": 40,
-                        "updated_at": "2024-03-22T01:01:33.000000Z",
-                        "created_at": "2024-03-22T01:01:33.000000Z",
-                        "id": 2,
-                        "path": "/var/www/html/app/Modules/File/Files/c6dd226b479f8c4b6ed988d11ce956b1"
-                    }
-                ],
-                additional_files: [
-                    {
-                        "original_name": "myToken.копия.моя.txt",
-                        "translated_name": "mytokenkopiyamoya",
-                        "hash_name": "c6dd226b479f8c4b6ed988d11ce956b1",
-                        "extension": "txt",
-                        "mime_type": "text/plain",
-                        "size": 40,
-                        "updated_at": "2024-03-22T01:01:33.000000Z",
-                        "created_at": "2024-03-22T01:01:33.000000Z",
-                        "id": 2,
-                        "path": "/var/www/html/app/Modules/File/Files/c6dd226b479f8c4b6ed988d11ce956b1"
-                    }, {
-                        "original_name": "myToken.копия.моя.txt",
-                        "translated_name": "mytokenkopiyamoya",
-                        "hash_name": "c6dd226b479f8c4b6ed988d11ce956b1",
-                        "extension": "txt",
-                        "mime_type": "text/plain",
-                        "size": 40,
-                        "updated_at": "2024-03-22T01:01:33.000000Z",
-                        "created_at": "2024-03-22T01:01:33.000000Z",
-                        "id": 2,
-                        "path": "/var/www/html/app/Modules/File/Files/c6dd226b479f8c4b6ed988d11ce956b1"
-                    }, {
-                        "original_name": "myToken.копия.моя.txt",
-                        "translated_name": "mytokenkopiyamoya",
-                        "hash_name": "c6dd226b479f8c4b6ed988d11ce956b1",
-                        "extension": "txt",
-                        "mime_type": "text/plain",
-                        "size": 40,
-                        "updated_at": "2024-03-22T01:01:33.000000Z",
-                        "created_at": "2024-03-22T01:01:33.000000Z",
-                        "id": 2,
-                        "path": "/var/www/html/app/Modules/File/Files/c6dd226b479f8c4b6ed988d11ce956b1"
-                    }
-                ],
-                description_files: 'Описание файлов портфеле',
+		if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
 
-                full_access: true,
-            })
-        })
-    }
+			throw new Error(result.message);
+		}
+
+		return result.data;
+	}
+
+
+	/**
+	 * @typedef {object} CreateEszDto
+	 * 
+	 * @property {number} CreateEszDto.theme_id
+	 * @property {string} CreateEszDto.content
+	 * @property {string} CreateEszDto.portfolio
+	 * @property {number} CreateEszDto.initiator_id
+	 * @property {number} CreateEszDto.signatory_id
+	 * @property {number[]} CreateEszDto.receivers
+	 * @property {number[]} CreateEszDto.observers
+	 * 
+	 * @param {CreateEszDto} payload
+	 * @return {Promise<any>}
+	 */
+	async create(payload) {
+		const result = await this._query({
+			payload,
+			nestedEndpoint: 'create'
+		});
+
+		if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join(' '));
+			}
+
+			throw new Error(result.message);
+		}
+
+
+
+		return result.data;
+	}
+
+
+	/**
+	 * @typedef {object} UpdateEszDto
+	 * 
+	 * @property {number} UpdateEszDto.document_id
+	 * @property {number} UpdateEszDto.theme_id
+	 * @property {string} UpdateEszDto.content
+	 * @property {string} UpdateEszDto.portfolio
+	 * @property {number} UpdateEszDto.initiator_id
+	 * @property {number} UpdateEszDto.signatory_id
+	 * @property {number[]} UpdateEszDto.receivers
+	 * @property {number[]} UpdateEszDto.observers
+	 * 
+	 * @param {UpdateEszDto} payload
+	 * @return {Promise<any>}
+	 */
+	async update(payload) {
+		const result = await this._query({
+			payload,
+			nestedEndpoint: 'update'
+		});
+
+		if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
+
+		return result.data;
+	}
+
+	/**
+	  * @param {{document_id: number}} payload
+	  * @return {Promise<any>}
+	  */
+	async delete(payload) {
+		const result = await this._query({
+			payload,
+			nestedEndpoint: 'delete'
+		});
+
+		if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
+
+		return result.data;
+	}
+
+	/**
+	  * @param {FormData} payload
+	  * @return {Promise<any>}
+	  */
+	async uploadFiles(payload) {
+		const result = await this._query({
+			payload,
+			nestedEndpoint: 'upload-files',
+		});
+
+		if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
+
+		return result.data;
+	}
+
+
+	/**
+	 * @param {number} documentId 
+	 * @returns {Promise<void>}
+	 */
+	async sendToApproval(documentId) {
+		const result = await this._query({
+			payload: { document_id: documentId },
+			nestedEndpoint: 'send-to-approval',
+		});
+
+		if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
+
+		return result.data;
+	}
+
+
+	/**
+	 * @param {number} documentId 
+	 * @returns {Promise<any>}
+	 */
+	async cancellation(documentId) {
+		const result = await this._query({
+			payload: { document_id: documentId },
+			nestedEndpoint: 'cancellation',
+		});
+
+		if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
+
+		return result.data;
+	}
+
 }

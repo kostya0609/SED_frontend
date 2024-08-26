@@ -54,7 +54,7 @@ const loading = ref(false);
 const refSearchUser = ref();
 
 const attachParticipant = async (user) => {
-	refSearchUser.value.resetUser();
+	refSearchUser.value && refSearchUser.value.resetUser();
 
 	if (participants.value.find(item => item.user.id === user.id)) {
 		notify.error(`${user.full_name} уже есть в списке участников!`);

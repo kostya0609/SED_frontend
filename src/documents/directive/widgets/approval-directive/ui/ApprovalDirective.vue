@@ -1,6 +1,5 @@
 <template>
 	<Process
-		ref="refInteraction"
 		@created="onCreated"
 		@deleted="onDeleted"
 		@runned="onRunned"
@@ -15,9 +14,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 import { TEMPLATE_ACTION } from "@/plugins/process/constants";
-import { useActiveTab, useDocument } from "@/documents/directive/entities/directive";
+import { useActiveTab, useDocument } from "@documents/directive/entities/directive";
 
 defineProps({
 	document: Object,
@@ -26,7 +25,8 @@ defineProps({
 const { setActiveTab } = useActiveTab();
 const { updateDocument } = useDocument();
 
-const refInteraction = ref();
+const interactionRef = inject('interactionRef');
+const processRef = inject('processRef');
 
 
 /**
@@ -60,7 +60,9 @@ const onDecided = async (action) => {
 		action.template_action_id === TEMPLATE_ACTION.MAKE_COMMENT_AND_NOTIFY_EXECUTOR_DOCUMENT) {
 
 		setActiveTab('interaction');
-		await refInteraction.value.updateComments();
+		setTimeout(async () => {
+			await interactionRef.value.updateComments();
+		}, 100);
 	}
 };
 

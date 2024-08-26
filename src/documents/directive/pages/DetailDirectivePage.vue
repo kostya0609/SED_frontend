@@ -7,6 +7,7 @@
 			:executor-id="document.creator.id"
 			:user-id="getUserId()"
 			:access="processAccesses"
+			ref="processRef"
 		>
 			<h3 class="header_h3">
 				{{ document.number }}, статус {{ document.status.title }}
@@ -54,7 +55,7 @@
 					name="interaction"
 					lazy
 				>
-					<Interaction />
+					<Interaction ref="interactionRef" />
 				</el-tab-pane>
 				<el-tab-pane
 					label="Иерархия"
@@ -96,21 +97,24 @@ import { DocumentCancelButton } from '@documents/directive/features/document-can
 import { DocumentDeleteButton } from '@documents/directive/features/document-delete';
 import { useActiveTab, useDocument } from "@documents/directive/entities/directive";
 import { useUser } from "@/common/app/composables";
-import { computed, onUnmounted } from 'vue';
-import { DOCUMENT_STATUS } from '@/documents/directive/entities/directive/constants';
+import { ref, computed, onUnmounted, provide } from 'vue';
+import { DOCUMENT_STATUS } from '@documents/directive/entities/directive/constants';
 
 const route = useRoute();
-const { getUserId, can } = useUser();
+const { getUserId, checkUserRights } = useUser();
 const { activeTab, setActiveTab } = useActiveTab();
-const { document, loading, initDocument } = useDocument();
+const { document, loading, initDocument, checkDocumentRights, checkDocumentStatus } = useDocument();
 
 await initDocument(route.params.id);
 
-const isEdit = computed(() => document.value.full_access && document.value.status_id === DOCUMENT_STATUS.PREPARATION);
+const processRef = ref();
+const interactionRef = ref();
+
+const isEdit = computed(() => checkDocumentRights('document_full_access') && checkDocumentStatus(DOCUMENT_STATUS.PREPARATION));
 
 const processAccesses = {
-	full: can('full_access'),
-	execute: document.value.full_access || can('full_access'),
+	full: checkUserRights('full_access'),
+	execute: checkDocumentRights('document_full_access'),
 };
 
 const documentForProcess = {
@@ -124,4 +128,7 @@ useBackButton({ fallbackPath: '/sed' });
 onUnmounted(() => {
 	setActiveTab('description');
 });
+
+provide('processRef', processRef);
+provide('interactionRef', interactionRef);
 </script>

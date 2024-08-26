@@ -5,9 +5,9 @@ export class UserRepository extends BaseRepository {
         super('users', 'v2');
     }
 
+
     /**
-     * nestedEndpoint?: string
-     * @returns {module:url.URL}
+     * @returns {URL} 
      */
     _buildUrl(nestedEndpoint){
         return new URL(`${this._url}/${this._endpoint}/${this._version}` + (nestedEndpoint ? `/${nestedEndpoint}` : ''));

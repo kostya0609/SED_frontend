@@ -41,8 +41,8 @@ import { useRouter } from 'vue-router';
 import { Preloader } from "@common/shared/ui";
 import MainFields from "./MainFields.vue";
 import Files from "./Files.vue";
-import { prepareFiles, notify, getFormDataFile } from '@common/shared/utils';
-import { ReviewRepo } from "@/documents/review/entities/review/api/index.js";
+import { prepareFiles, notify, getFormDataFileList  } from '@common/shared/utils';
+import { ReviewRepo } from "@documents/review/entities/review/api/index.js";
 import { createDocumentLink } from '@documents/common/entities/document';
 import { useUser } from "@/common/app/composables";
 
@@ -64,7 +64,7 @@ const form = ref();
 const rules = reactive({
   theme: { required: true, message: 'Необходимо ввести тему документа' },
   content: { required: true, message: 'Необходимо ввести содержание документа' },
-  responsible: { required: true, message: 'Необходимо указать инициатора' },
+  initiator: { required: true, message: 'Необходимо указать инициатора' },
   receivers: { required: true, message: 'Необходимо указать получающих' },
 
   main: { required: false, message: 'Необходимо прикрепить основные файлы' },
@@ -76,15 +76,13 @@ const formData = reactive({
   theme: null,
   content: '',
   portfolio: '',
-  responsible: null,
+  initiator: null,
   receivers: [],
 
   main: [],
 });
 
 const defaultValues = reactive({
-  responsible: [],
-  receivers: [],
   themes: [],
 });
 
@@ -100,27 +98,37 @@ const submit = async () => {
   form.value.validate(async (isValid) => {
     if (!isValid) return;
 
-    let document;
+    let document, dto, files, link;
 
     try {
       loading.value = true;
-      let dto = {
+      dto = {
         document_id: formData.id,
         theme_id: formData.theme.id,
         content: formData.content,
         portfolio: formData.portfolio,
-        responsible_id: formData.responsible.id,
         receivers: formData.receivers.map(el => el.id),
       };
 
-      props.mode === 'create' ? document = await ReviewRepo.create(dto) : document = await ReviewRepo.update(dto);
+      if (props.mode === 'create') {
+        document = await ReviewRepo.create(dto);
+        if (formData.main.length > 0) {
+          files = getFormDataFileList(document.id)
+            .append(formData.main, 'main')
+            .get();
+          await ReviewRepo.uploadFiles(files);
+        }
 
-      if (formData.main.length > 0) {
-        let sendFiles = getFormDataFile(document.id, formData.main, 'main');
-        await ReviewRepo.uploadFiles(sendFiles);
+      } else {
+        document = await ReviewRepo.update(dto);
+        files = getFormDataFileList(document.id)
+          .append(formData.main, 'main')
+          .get();
+
+        await ReviewRepo.uploadFiles(files);
       }
 
-      const link = createDocumentLink(document.type_id, 'detail', document.id);
+      link = createDocumentLink(document.type_id, 'detail', document.id);
       router.push(link);
 
     } catch (e) {
@@ -139,7 +147,7 @@ if (props.mode === 'edit') {
     id,
     theme,
     contents,
-    responsible,
+    initiator,
     receivers,
 
     main_files,
@@ -152,18 +160,13 @@ if (props.mode === 'edit') {
   formData.content = contents.content;
   formData.portfolio = contents.portfolio;
 
-  formData.responsible = responsible.user;
-  defaultValues.responsible[0] = responsible.user;
-
+  formData.initiator = initiator.user;
   formData.receivers = receivers.map(el => el.user);
-  defaultValues.receivers = receivers.map(el => el.user);
 
   formData.main = prepareFiles(main_files ? main_files.map(el => el.file) : []);
-}
-else {
-	defaultValues.responsible[0] = user;
-	formData.responsible = defaultValues.responsible[0];
-};
+
+} else formData.initiator = user;
+
 
 watch([() => formData.main.length,], () => {
   form.value.validateField(['main',], () => null);

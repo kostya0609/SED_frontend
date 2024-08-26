@@ -160,7 +160,7 @@ const submit = async () => {
       loading.value = true;
       const id = props.mode === 'create' ? await StaticRoleRepo.create(formDataToSend) : await StaticRoleRepo.update(formDataToSend);
 
-      router.push('/admin/roles/statics/detail/' + id);
+      router.push('/sed/admin/roles/statics/detail/' + id);
 
     } catch (e) {
       notify.fetchError(e.message);

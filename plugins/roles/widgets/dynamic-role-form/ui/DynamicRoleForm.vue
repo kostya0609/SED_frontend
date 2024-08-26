@@ -92,7 +92,7 @@ const submit = async () => {
       loading.value = true;
       const id = props.mode === 'create' ? await DynamicRoleRepo.create(formData) : await DynamicRoleRepo.update(formData);
 
-      router.push('/admin/roles/dynamics/detail/' + id);
+      router.push('/sed/admin/roles/dynamics/detail/' + id);
 
     } catch (e) {
       notify.fetchError(e.message);

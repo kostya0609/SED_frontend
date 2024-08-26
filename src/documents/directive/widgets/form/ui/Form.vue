@@ -41,8 +41,8 @@ import { useRouter } from 'vue-router';
 import { Preloader } from "@common/shared/ui";
 import MainFields from "./MainFields.vue";
 import Files from "./Files.vue";
-import { prepareFiles, formatDateTime, notify, getFormDataFile } from '@common/shared/utils';
-import { DirectiveRepo } from "@/documents/directive/entities/directive/api/index.js";
+import { prepareFiles, formatDateTime, notify, getFormDataFileList } from '@common/shared/utils';
+import { DirectiveRepo } from "@documents/directive/entities/directive/api/index.js";
 import { createDocumentLink } from '@documents/common/entities/document';
 import { useUser } from "@/common/app/composables";
 
@@ -68,7 +68,6 @@ const rules = reactive({
 	creator: { required: true, message: 'Необходимо указать создателя' },
 	author: { required: true, message: 'Необходимо указать автора' },
 	executors: { required: true, message: 'Необходимо указать исполнителей' },
-
 	main: { required: false, message: 'Необходимо прикрепить основные файлы' },
 	portfolio: { required: false, message: 'Необходимо ввести описание портфеля документов' },
 });
@@ -89,11 +88,6 @@ const formData = reactive({
 });
 
 const defaultValues = reactive({
-	creator: [],
-	author: [],
-	executors: [],
-	controllers: [],
-	observers: [],
 	themes: [],
 });
 
@@ -109,11 +103,11 @@ const submit = async () => {
 	form.value.validate(async (isValid) => {
 		if (!isValid) return;
 
-		let document;
+		let document, dto, files, link;
 
 		try {
 			loading.value = true;
-			let dto = {
+			dto = {
 				document_id: formData.id,
 				theme_id: formData.theme.id,
 				executed_at: formData.executed_at,
@@ -127,14 +121,25 @@ const submit = async () => {
 				observers: formData.observers.map(el => el.id),
 			};
 
-			props.mode === 'create' ? document = await DirectiveRepo.create(dto) : document = await DirectiveRepo.update(dto);
+			if (props.mode === 'create') {
+				document = await DirectiveRepo.create(dto);
+				if (formData.main.length > 0) {
+					files = getFormDataFileList(document.id)
+						.append(formData.main, 'main')
+						.get();
+					await DirectiveRepo.uploadFiles(files);
+				}
 
-			if (formData.main.length > 0) {
-				let sendFiles = getFormDataFile(document.id, formData.main, 'main');
-				await DirectiveRepo.uploadFiles(sendFiles);
+			} else {
+				document = await DirectiveRepo.update(dto);
+				files = getFormDataFileList(document.id)
+					.append(formData.main, 'main')
+					.get();
+
+				await DirectiveRepo.uploadFiles(files);
 			}
 
-			const link = createDocumentLink(document.type_id, 'detail', document.id);
+			link = createDocumentLink(document.type_id, 'detail', document.id);
 			router.push(link);
 
 		} catch (e) {
@@ -145,7 +150,6 @@ const submit = async () => {
 		}
 
 	});
-
 
 };
 
@@ -179,25 +183,15 @@ if (props.mode === 'edit') {
 	});
 
 	formData.creator = creator.user;
-	defaultValues.creator[0] = creator.user;
-
 	formData.author = author.user;
-	defaultValues.author[0] = author.user;
-
-	defaultValues.executors = executors.map(el => el.user);
 	formData.executors = executors.map(el => el.user);
-
 	formData.controllers = controllers.map(el => el.user);
-	defaultValues.controllers = controllers.map(el => el.user);
-
 	formData.observers = observers.map(el => el.user);
-	defaultValues.observers = observers.map(el => el.user);
 
 	formData.main = prepareFiles(main_files ? main_files.map(el => el.file) : []);
-} else {
-	defaultValues.creator[0] = user;
-	formData.creator = defaultValues.creator[0];
-}
+
+} else formData.creator = user;
+
 
 watch([() => formData.main.length], () => {
 	form.value.validateField(['main'], () => null);

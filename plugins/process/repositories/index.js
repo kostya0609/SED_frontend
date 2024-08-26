@@ -4,6 +4,7 @@ import { UserRepository } from "./UserRepository";
 import { TypeRepository } from "./TypeRepository";
 import { ParticipantRepository } from "./ParticipantRepository";
 import { InteractionCommentRepository } from "./InteractionCommentRepository";
+import { FactoryRepository } from "./FactoryRepository";
 
 export const useInitRepositories = (optionsAPI) => {
 	const repositories = {
@@ -13,6 +14,7 @@ export const useInitRepositories = (optionsAPI) => {
 		TypeRepo: new TypeRepository(),
 		ParticipantRepo: new ParticipantRepository(),
 		InteractionCommentRepo: new InteractionCommentRepository(),
+		FactoryRepo: new FactoryRepository(),
 	};
 
 	Object.keys(repositories).forEach(repoName => {

@@ -1,116 +1,132 @@
 <template>
-  <div class="directive-description-tab">
-    <el-table
-      :data="table_data"
-      class="directive-description-tab__table"
-      border
-      stripe
-      scrollbar-always-on
-      :show-header="false"
-    >
-      <el-table-column
-        prop="name"
-        width="300"
-      />
-      <el-table-column>
-        <template #default="{ row }">
-          <div
-            v-if="Array.isArray(row.value)"
-            v-for="item in row.value"
-            class="role-table_col mb-3"
-          >
-            <UserLink
-              v-if="item.full_name"
-              :user="item"
-            />
+	<el-descriptions
+		border
+		:column="1"
+	>
+		<el-descriptions-item label="Номер">
+			{{ document.number }}
+		</el-descriptions-item>
 
-            <el-link
-              v-if="item.original_name"
-              :underline="false"
-              :href="getDownLoadLink(item.id)"
-              download
-            >
-              {{ item.original_name }}
-            </el-link>
+		<el-descriptions-item label="Тип документа">
+			{{ document.type.title }}
+		</el-descriptions-item>
 
-            <span
-              v-if="typeof item === 'string'"
-              v-html="item"
-            >
-            </span>
+		<el-descriptions-item label="Статус">
+			{{ document.status.title }}
+		</el-descriptions-item>
 
-          </div>
+		<el-descriptions-item label="Тема">
+			{{ document.theme }}
+		</el-descriptions-item>
 
+		<el-descriptions-item label="Дата создания">
+			{{ formatDateTime(document.created_at) }}
+		</el-descriptions-item>
 
-          <div v-else>
-            <UserLink
-              v-if="row.value.full_name"
-              :user="row.value"
-            />
+		<el-descriptions-item label="Срок исполнения">
+			{{ formatDateTime(document.executed_at) }}
+		</el-descriptions-item>
 
-            <span v-if="typeof row.value === 'string'">
-              {{ row.value }}
-            </span>
+		<el-descriptions-item label="Документ основания">
+			<template v-if="document.parent">
+				{{ document.parent.number }}
+			</template>
+			<el-text
+				type="info"
+				v-else
+			>
+				Отсутствует
+			</el-text>
+		</el-descriptions-item>
 
-          </div>
+		<el-descriptions-item label="Содержание документа">
+			{{ document.contents.content }}
+		</el-descriptions-item>
 
-        </template>
-      </el-table-column>
-    </el-table>
-  </div>
+		<el-descriptions-item label="Описание портфеля документов">
+			<template v-if="document.contents && document.contents.portfolio">
+				{{ document.contents.portfolio }}
+			</template>
+			<el-text
+				type="info"
+				v-else
+			>
+				Отсутствует
+			</el-text>
+		</el-descriptions-item>
+
+		<el-descriptions-item label="Создатель">
+			<UserLink :user="document.creator.user" />
+		</el-descriptions-item>
+
+		<el-descriptions-item label="Автор">
+			<UserLink :user="document.author.user" />
+		</el-descriptions-item>
+
+		<el-descriptions-item label="Исполнители">
+			<ParticipantList :participants="document.executors" />
+		</el-descriptions-item>
+
+		<el-descriptions-item label="Контроллер">
+			<ParticipantList
+				v-if="document.controllers.length > 0"
+				:participants="document.controllers"
+			/>
+			<el-text
+				type="info"
+				v-else
+			>
+				Отсутствуют
+			</el-text>
+		</el-descriptions-item>
+
+		<el-descriptions-item label="Наблюдатели">
+			<ParticipantList
+				v-if="document.observers.length > 0"
+				:participants="document.observers"
+			/>
+			<el-text
+				type="info"
+				v-else
+			>
+				Отсутствуют
+			</el-text>
+		</el-descriptions-item>
+
+		<el-descriptions-item label="Основные файлы">
+			<AttachmentList
+				v-if="document.main_files.length > 0"
+				:attachments="document.main_files"
+			/>
+			<el-text
+				type="info"
+				v-else
+			>
+				Отсутствуют
+			</el-text>
+		</el-descriptions-item>
+	</el-descriptions>
 </template>
 
 <script setup>
+import { UserLink, ParticipantList, AttachmentList } from '@/common/shared/ui';
+import { formatDateTime } from '@/common/shared/utils';
 
-import { ref, watchEffect } from "vue";
-import { formatDateTime, getDownLoadLink } from "@common/shared/utils"
-import { UserLink } from "@common/shared/ui"
-
-const props = defineProps({
-  document: Object,
+defineProps({
+	document: Object,
 });
-
-const table_data = ref([]);
-
-watchEffect(() => {
-  table_data.value = [];
-  table_data.value.push({ name: 'Номер документа:', value: props.document.number ?? 'нет данных' });
-  table_data.value.push({ name: 'Тип документа:', value: props.document.type.title ?? 'нет данных' });
-  table_data.value.push({ name: 'Статус:', value: props.document.status.title ?? 'нет данных' });
-  table_data.value.push({ name: 'Тема документа:', value: props.document.theme.title ?? 'нет данных' });
-  table_data.value.push({ name: 'Дата создания:', value: formatDateTime(props.document.created_at) ?? 'нет данных' });
-  table_data.value.push({ name: 'Срок исполнения:', value: formatDateTime(props.document.executed_at) ?? 'нет данных' });
-  table_data.value.push({ name: 'Документ основание:', value: props.document.parent ?? 'нет данных' });
-  table_data.value.push({ name: 'Содержание документа:', value: props.document.contents.content ?? 'нет данных' });
-  table_data.value.push({
-    name: 'Описание портфеля документов:',
-    value: props.document.contents.portfolio ?? 'нет данных'
-  });
-
-  table_data.value.push({ name: 'Создатель:', value: props.document.creator ? props.document.creator.user: 'нет данных' });
-  table_data.value.push({ name: 'Автор:', value: props.document.author ? props.document.author.user : 'нет данных' });
-  table_data.value.push({ name: 'Исполнители:', value: props.document.executors.length > 0 ? props.document.executors.map(el => el.user) :  'нет данных' });
-  table_data.value.push({ name: 'Контроллеры:', value: props.document.controllers.length > 0 ? props.document.controllers.map(el => el.user) :'нет данных' });
-  table_data.value.push({ name: 'Наблюдатели:', value: props.document.observers.length > 0 ? props.document.observers.map(el => el.user) : 'нет данных' });
-  table_data.value.push({
-    name: 'Основные файлы',
-    value: props.document.main_files ? props.document.main_files.map(el => el.file) : 'нет данных'
-  });
-})
-
 </script>
 
-<style
-  scoped
-  lang="scss"
->
-.directive-description-tab {
-  &__table {
-    width: 100%;
+<style scoped lang="scss">
+::v-deep(.el-descriptions__label.el-descriptions__cell.is-bordered-label) {
+	width: 300px;
+}
 
-    &::v-deep(.role-table_col:last-child) {
-      margin-bottom: 0px !important;
-    }
-  }
+::v-deep(.el-descriptions__table tr:nth-child(odd) td) {
+	background: var(--el-fill-color-lighter);
+}
+
+::v-deep(.el-descriptions__table tr:nth-child(even) td) {
+	background: var(--el-table-tr-bg-color);
 }
 </style>

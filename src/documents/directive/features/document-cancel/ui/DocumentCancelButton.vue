@@ -7,7 +7,7 @@
 	</el-button>
 </template>
 <script setup>
-import { useDocument } from '@/documents/directive/entities/directive';
+import { useDocument } from '@documents/directive/entities/directive';
 import { ElMessageBox } from 'element-plus';
 
 const { cancel } = useDocument();
@@ -20,7 +20,7 @@ const handleClick = async () => {
 	await ElMessageBox.confirm(`Вы уверены, что хотите аннулировать документ?`, {
 		type: 'warning',
 		callback: async (action) => {
-			if (action === 'cancel') {
+			if (action !== 'confirm') {
 				return;
 			}
 

@@ -4,23 +4,42 @@
 		@click="handleClick"
 	>
 		<slot>
-			Отправить на исполнение
+			Отправить на согласование
 		</slot>
 	</el-button>
 </template>
 <script setup>
-import { useActiveTab } from "@documents/esz/entities/esz";
+import { ESZRepo } from "@documents/esz/entities/esz/api";
+import { DOCUMENT_STATUS } from "@documents/esz/entities/esz/constants";
+import { useActiveTab, useDocument } from "@documents/esz/entities/esz";
+import { inject } from "vue";
 
-defineProps({
+const processRef = inject('processRef');
+
+const { checkDocumentStatus } = useDocument();
+
+const props = defineProps({
 	type: {
 		type: String,
 		default: 'primary',
-	}
+	},
+	documentId: {
+		type: Number,
+	},
 });
 
 const { setActiveTab } = useActiveTab();
 
-const handleClick = () => {
-	setActiveTab('process');
+const handleClick = async () => {
+	if (checkDocumentStatus([DOCUMENT_STATUS.PREPARATION, DOCUMENT_STATUS.FIX])) {
+		setActiveTab('process');
+	} else {
+		await ESZRepo.sendToApproval(props.documentId);
+
+		// TODO: Исправить косяк с обновлением процесса
+		// processRef.value.updateProcess();
+
+		location.reload();
+	}
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
 	<el-button
-		:type="type"
+		type="danger"
 		@click="handleClick"
 	>
 		<slot>
@@ -9,13 +9,32 @@
 	</el-button>
 </template>
 <script setup>
-defineProps({
-	type: {
-		type: String,
-		default: 'danger',
+import { ElMessageBox } from 'element-plus';
+import { useDocument } from "@documents/esz/entities/esz";
+import { inject } from 'vue';
+
+const processRef = inject('processRef');
+
+const props = defineProps({
+	document_id: {
+		type: Number,
+		requared: true,
 	}
 });
-const handleClick = () => {
-	console.log('TODO: аннулировать документ');
+
+const { cancel } = useDocument();
+
+const handleClick = async () => {
+	await ElMessageBox.confirm(`Вы уверены, что хотите аннулировать документ?`, {
+		type: 'warning',
+		callback: async (action) => {
+			if (action !== 'confirm') {
+				return;
+			}
+
+			await cancel(props.document_id);
+			await processRef.value.updateProcess();
+		},
+	});
 };
 </script>

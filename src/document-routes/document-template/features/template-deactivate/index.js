@@ -1,0 +1,1 @@
+export { default as TemplateDeactivateButton } from './TemplateDeactivateButton.vue';

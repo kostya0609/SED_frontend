@@ -3,6 +3,7 @@ import { notify } from "@common/shared/utils";
 import { DirectiveRepo } from "@documents/directive/entities/directive/api";
 
 const document = ref(null);
+const documentRights = ref([]);
 const loading = ref(false);
 
 export const useDocument = () => {
@@ -15,7 +16,8 @@ export const useDocument = () => {
 			loading.value = true;
 			const result = await DirectiveRepo.getById({ document_id });
 
-			document.value = result;
+			document.value = result.document;
+			documentRights.value = result.rights;
 
 		} catch (e) {
 			notify.fetchError(e.message);
@@ -32,7 +34,8 @@ export const useDocument = () => {
 			loading.value = true;
 			const result = await DirectiveRepo.getById({ document_id: document.value.id });
 
-			document.value = result;
+			document.value = result.document;
+			documentRights.value = result.rights;
 
 		} catch (e) {
 			notify.fetchError(e.message);
@@ -75,6 +78,51 @@ export const useDocument = () => {
 		}
 	};
 
+	/**
+	 * @returns {string[]} Возвращает массив прав доступа
+	 */
+	const getRights = () => {
+		return documentRights.value;
+	};
+
+	/**
+	 * @description Возвращает true, если текущий пользователь имеет права доступа в текущем документе
+	 * 
+	 * @param {'document_full_access'} rights
+	 * @returns {boolean}
+	 */
+	const checkDocumentRights = (rights) => {
+		if (typeof rights === 'string') {
+			return documentRights.value.includes(rights);
+		} else if (Array.isArray(rights)) {
+			for (const value of rights) {
+				if (documentRights.value.includes(value)) {
+					return true;
+				}
+			}
+
+			return false;
+		} else {
+			throw new Error('Неверный тип прав доступа');
+		}
+	};
+
+	/**
+	 * @description Проверяет документ Поручени на указанные статусы
+	 * 
+	 * @param {number|number[]} statuses 
+	 * @returns {boolean}
+	 */
+	const checkDocumentStatus = (statuses) => {
+		if (Array.isArray(statuses)) {
+			return statuses.includes(document.value.status_id);
+		} else if (typeof statuses === 'number') {
+			return document.value.status_id === statuses;
+		} else {
+			throw new Error('Неверный формат статуса документа');
+		}
+	}
+
 	return {
 		document,
 		loading,
@@ -82,5 +130,8 @@ export const useDocument = () => {
 		updateDocument,
 		cancel,
 		remove,
+		checkDocumentRights,
+		getRights,
+		checkDocumentStatus,
 	}
 }

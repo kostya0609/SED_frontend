@@ -1,37 +1,26 @@
 <template>
 	<Preloader :loading="loading">
-		<Form mode="edit" :data="document" />
+		<Form
+			mode="edit"
+			:data="document"
+		/>
 	</Preloader>
 </template>
 
 <script setup>
-
 import { useRoute } from 'vue-router';
 import { Preloader } from '@common/shared/ui/index.js';
-import { Form } from '@/documents/review/widgets/form';
+import { Form } from '@documents/review/widgets/form';
 import { useBackButton } from '@/plugins/menu';
-import { ReviewRepo } from "@/documents/review/entities/review/api/index.js";
-import { notify } from "@common/shared/utils/index.js";
 import { ref } from "vue";
+import { useDocument } from '@documents/review/entities/review';
 
 const route = useRoute();
 const loading = ref(false);
-const document = ref(null);
 
-const getDocument = async (document_id) => {
-	try {
-		loading.value = true;
-		const result = await ReviewRepo.getById({ document_id });
-		document.value = result;
-	} catch (e) {
-		notify.fetchError(e.message);
-		throw e;
-	} finally {
-		loading.value = false;
-	}
-};
+const { document, initDocument } = useDocument();
 
-await getDocument(route.params.id);
+await initDocument(route.params.id);
 
 useBackButton({ fallbackPath: '/sed' });
 </script>

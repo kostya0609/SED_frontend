@@ -11,7 +11,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { createDocumentLink } from '@documents';
-import { useDocument } from '@/documents/review/entities/review';
+import { useDocument } from '@documents/review/entities/review';
 
 const router = useRouter();
 const {document} = useDocument();
