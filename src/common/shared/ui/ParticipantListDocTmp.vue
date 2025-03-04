@@ -1,29 +1,29 @@
 <template>
-    <ul class="participant-list">
-        <li
-            v-for="participant of participants"
-            :key="participant.id"
-        >
-            <UserLink :user="participant" />
-        </li>
-    </ul>
+	<ul class="participant-list">
+		<li
+			v-for="participant of participants"
+			:key="participant.id"
+		>
+			<Participant :participant="participant" />
+		</li>
+	</ul>
 </template>
 
 <script setup>
-import { UserLink } from '@/common/shared/ui';
+import Participant from './Participant.vue';
 
 const props = defineProps({
-    participants: Object,
+	participants: Object,
 });
 </script>
 
 <style scoped lang="scss">
 .participant-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: .5rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: .5rem;
 }
 </style>

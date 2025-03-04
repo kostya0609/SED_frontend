@@ -1,5 +1,5 @@
 /**
- * @typedef {'state-loaded'|'state-save'|'change-data'} Events
+ * @typedef {'state-loaded'|'state-save'|'change-data'|'before-change-data'} Events
  */
 export class EventEmitter {
 	constructor() {

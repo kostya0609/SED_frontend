@@ -15,7 +15,6 @@ export class DirectiveRepository extends BaseRepository {
 		return new URL(`${this._url}/${this._endpoint}/${this._version}` + (nestedEndpoint ? `/${nestedEndpoint}` : ''));
 	}
 
-
 	/**
 	 * @param {{document_id: number}} payload
 	 * @return {Promise<any>}
@@ -25,12 +24,9 @@ export class DirectiveRepository extends BaseRepository {
 			payload,
 			nestedEndpoint: 'get'
 		});
-		if (!result.success)
-			throw new Error(result.errors ? Object.values(result.errors) : result.message);
-
+		this._handleError(result);
 		return result.data;
 	}
-
 
 	/**
 	 * @param {{
@@ -41,17 +37,14 @@ export class DirectiveRepository extends BaseRepository {
 	 * }} payload
 	 * @return {Promise<any>}
 	 */
-	async create(payload) {
+	async preCreate(payload) {
 		const result = await this._query({
 			payload,
-			nestedEndpoint: 'create'
+			nestedEndpoint: 'pre-create'
 		});
-		if (!result.success)
-			throw new Error(result.errors ? Object.values(result.errors) : result.message);
-
+		this._handleError(result);
 		return result.data;
 	}
-
 
 	/**
 	 * @param {{
@@ -68,9 +61,7 @@ export class DirectiveRepository extends BaseRepository {
 			payload,
 			nestedEndpoint: 'update'
 		});
-		if (!result.success)
-			throw new Error(result.errors ? Object.values(result.errors) : result.message);
-
+		this._handleError(result);
 		return result.data;
 	}
 
@@ -83,9 +74,7 @@ export class DirectiveRepository extends BaseRepository {
 			payload,
 			nestedEndpoint: 'delete'
 		});
-		if (!result.success)
-			throw new Error(result.errors ? Object.values(result.errors) : result.message);
-
+		this._handleError(result);
 		return result.data;
 	}
 
@@ -98,10 +87,7 @@ export class DirectiveRepository extends BaseRepository {
 			payload,
 			nestedEndpoint: 'upload-files',
 		});
-
-		if (!result.success)
-			throw new Error(result.errors ? Object.values(result.errors) : result.message);
-
+		this._handleError(result);
 		return result.data;
 	}
 
@@ -114,11 +100,20 @@ export class DirectiveRepository extends BaseRepository {
 			payload,
 			nestedEndpoint: 'cancel'
 		});
-		if (!result.success)
-			throw new Error(result.errors ? Object.values(result.errors) : result.message);
-
+		this._handleError(result);
 		return result.data;
 	}
 
-
+	/**
+	 * @param {{ document_id: number }} payload
+	 * @returns {Promise<any>}
+	 */
+	async sendToApproval(payload) {
+		const result = await this._query({
+			payload,
+			nestedEndpoint: 'send-to-approval'
+		});
+		this._handleError(result);
+		return result.data;
+	}
 }

@@ -54,6 +54,7 @@ export const menu = [
 		title: 'Администрирование',
 		path: '/admin',
 		rights: ['full_access'],
+		icon: 'Grid'
 	}
 ];
 ```

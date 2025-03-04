@@ -27,8 +27,4 @@ const adminRoutes = {
  */
 export const routes = [
 	adminRoutes,
-	{
-		path: '/:pathMatch(.*)*',
-		component: NotFoundPage,
-	},
 ];

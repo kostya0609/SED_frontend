@@ -1,5 +1,6 @@
-import {DocumentRepository} from './DocumentRepository';
+import { DocumentRepository } from './DocumentRepository';
 
 export const DocumentRepo = new DocumentRepository();
 
-export {createDocumentLink} from './createDocumentLink';
+export { createDocumentLink } from './createDocumentLink';
+export { useActiveList } from './useActiveList';

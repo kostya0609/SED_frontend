@@ -1,0 +1,1 @@
+export { default as SelectDocumentTemplate } from './SelectDocumentTemplate.vue';

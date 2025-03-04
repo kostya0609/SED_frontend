@@ -1,0 +1,1 @@
+export { default as DeleteRoute } from './DeleteRoute.vue'

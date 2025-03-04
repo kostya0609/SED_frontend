@@ -1,6 +1,6 @@
 <template>
     <Preloader :loading="loading">
-        <h3>Редактирование маршрута - {{ documentRoute.title }}</h3>
+        <h3 class="header_h3">Редактирование маршрута - {{ documentRoute.title }}</h3>
         <Form
             mode="edit"
             :data="documentRoute"

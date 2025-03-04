@@ -1,8 +1,14 @@
-export default {
+import { VariableStore } from '@/plugins/bsi-table/entities/setting';
 
+export default {
 	/**
 	 * @param {import('vue').App} app 
-	 * @param {{ [key: string]: any}} options 
+	 * @param {{
+	 * 	options: {
+	 * 		module: string;
+	 * 		userId: number;
+	 * }
+	 * }} options 
 	 */
 	install(app, options) {
 		if (!options.module) {
@@ -15,5 +21,6 @@ export default {
 
 		app.provide('moduleName', options.module);
 		app.provide('userId', options.userId);
+		app.provide('table-local-store', new VariableStore());
 	}
 };

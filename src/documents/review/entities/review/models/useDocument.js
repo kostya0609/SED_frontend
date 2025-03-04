@@ -124,5 +124,23 @@ export const useDocument = () => {
 		}
 	};
 
-	return { document, loading, initDocument, updateDocument, cancel, remove, checkDocumentRights, getRights, checkDocumentStatus };
+	/**
+	 * @param {number} documentId 
+	 * @returns {void}
+	 */
+	const sendToApproval = async (documentId) => {
+		try {
+			loading.value = true;
+			document.value = await ReviewRepo.sendToApproval(documentId);
+		}
+		catch (e) {
+			notify.fetchError(e.message);
+			throw e;
+		} finally {
+			loading.value = false;
+		}
+	};
+
+
+	return { document, loading, initDocument, updateDocument, cancel, remove, checkDocumentRights, getRights, checkDocumentStatus, sendToApproval };
 }

@@ -1,0 +1,1 @@
+export { default as SendToSignatoryButton } from './SendToSignatoryButton.vue';

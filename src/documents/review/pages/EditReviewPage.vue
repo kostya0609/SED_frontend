@@ -16,11 +16,20 @@ import { ref } from "vue";
 import { useDocument } from '@documents/review/entities/review';
 
 const route = useRoute();
-const loading = ref(false);
-
 const { document, initDocument } = useDocument();
+
+const props = defineProps({
+	hideBackButton: {
+		type: Boolean,
+		default: false,
+	}
+});
+
+const loading = ref(false);
 
 await initDocument(route.params.id);
 
-useBackButton({ fallbackPath: '/sed' });
+if (!props.hideBackButton) {
+	useBackButton({ fallbackPath: '/sed' });
+}
 </script>

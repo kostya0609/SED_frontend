@@ -135,6 +135,13 @@ export default function(data) {
                 console.log('Метод при срабатывании фокуса на элементе ');
             }
         },
+        string     : {
+            value : '',
+            show : true,
+            focus : function(){
+                console.log('Метод при срабатывании фокуса на элементе ');
+            }
+        },
         searchList  : {
             multiple : false,
             value : '',

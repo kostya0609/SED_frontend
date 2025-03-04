@@ -4,4 +4,4 @@ export { Form as DirectiveForm, Description as DirectiveDescription } from './di
 
 export { Form as ReviewForm, Description as ReviewDescription } from './review';
 
-export { default as SelectParentModal } from './SelectParentModal.vue';
+export { default as SelectParentTemplate } from './SelectParentTemplate.vue';

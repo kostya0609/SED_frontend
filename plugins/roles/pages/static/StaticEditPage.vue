@@ -7,6 +7,7 @@
             <el-col :md=12>
                 <StaticRoleForm
                     mode="edit"
+                    :partition_id="role.partition.id"
                     :data="role"
                 />
             </el-col>

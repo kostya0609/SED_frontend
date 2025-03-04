@@ -24,16 +24,9 @@ export class PartitionRepository extends BaseRepository {
             payload,
             nestedEndpoint: 'get'
         });
-        if (!result.success) {
-			if (result.errors) {
-				throw new Error(Object.values(result.errors).join('\n'));
-			}
-
-			throw new Error(result.message);
-		}
-
+        this._handleError(result);
         return result.data;
-    }  
+    }
 
     /**
      * @param {{user_id: number}} payload
@@ -44,15 +37,58 @@ export class PartitionRepository extends BaseRepository {
             payload,
             nestedEndpoint: 'get-tree'
         });
-        if (!result.success) {
-			if (result.errors) {
-				throw new Error(Object.values(result.errors).join('\n'));
-			}
-
-			throw new Error(result.message);
-		}
-
+        this._handleError(result);
         return result.data;
-    }  
+    }
 
+    /**
+     * @returns {Promise<any>}
+     */
+    async getTreeForSelectTemplate() {
+        const result = await this._query({
+            payload: {},
+            nestedEndpoint: 'get-tree-for-select-template',
+        });
+        this._handleError(result);
+        return result.data;
+    }
+
+    /**
+     * @param {{title: string, parent_id: ?number}} payload
+     * @return {Promise<any>}
+     */
+    async create(payload) {
+        const result = await this._query({
+            payload,
+            nestedEndpoint: 'create',
+        });
+        this._handleError(result);
+        return result.data;
+    }
+
+    /**
+     * @param {{id: number, title: ?string, parent_id : ?number}} payload
+     * @return {Promise<any>}
+     */
+    async edit(payload) {
+        const result = await this._query({
+            payload,
+            nestedEndpoint: 'edit',
+        });
+        this._handleError(result);
+        return result.data;
+    }
+
+    /**
+     * @param {{id: number}} payload
+     * @return {Promise<any>}
+     */
+    async delete(payload) {
+        const result = await this._query({
+            payload,
+            nestedEndpoint: 'delete',
+        });
+        this._handleError(result);
+        return result.data;
+    }
 }

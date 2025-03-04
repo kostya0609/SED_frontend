@@ -11,6 +11,9 @@
 			:key="item.path"
 		>
 			<el-menu-item :index="item.path">
+				<el-icon v-if="item.icon">
+					<component :is="item.icon" />
+				</el-icon>
 				<Counter
 					v-if="item.count"
 					:title="item.title"
@@ -35,6 +38,10 @@
 				@click="button.onClick"
 				class="menu__action-button"
 			/>
+			<Dropdown
+				v-if="activeMenuItem && activeMenuItem.dropdown"
+				:params="activeMenuItem.dropdown"
+			/>
 		</el-menu-item>
 	</el-menu>
 </template>
@@ -42,13 +49,15 @@
 import { useRoute } from 'vue-router';
 import { Counter } from '../features/counter';
 import { ActionButton } from '../features/action-button';
+import { Dropdown } from '../features/dropdown';
 import { computed, ref, watch, inject } from 'vue';
 import {
 	getNormalizedRoutePath,
 	getMenuItemByPath,
 	getReplacementsMenu,
 	getInitialMenuByPath,
-	prepareMenu
+	prepareMenu,
+	includesArray
 } from '../shared/utils';
 
 const defaultMenu = inject('menu');
@@ -69,7 +78,15 @@ const allMenu = computed(() => [...getReplacementsMenu(defaultMenu.value), defau
 
 const getAllActionButtons = (menuItem, buttonsFromGlobal) => {
 	const buttonsFromMenu = menuItem ? menuItem.buttons || [] : [];
-	return [...buttonsFromMenu, ...buttonsFromGlobal];
+	const buttons = [...buttonsFromMenu, ...buttonsFromGlobal];
+
+	return buttons.filter((button) => {
+		if (Array.isArray(button.rights)) {
+			return includesArray(button.rights, props.rights);
+		}
+
+		return true;
+	});
 };
 
 watch([() => route.path, () => props.rights], () => {
@@ -85,24 +102,25 @@ watch([() => route.path, () => props.rights], () => {
 	menu.value = prepareMenu(initialMenu, props.rights);
 	activeMenuItem.value = getMenuItemByPath(menu.value, normalizedPath);
 
-	
+
 	if (activeMenuItem.value && activeMenuItem.value.replaceMenu) {
 		menu.value = prepareMenu(activeMenuItem.value.replaceMenu, props.rights);
 		activeMenuItem.value = getMenuItemByPath(menu.value, normalizedPath);
 	}
-	
+
 }, { immediate: true });
 
 watch(() => defaultMenu.value, (defaultMenu) => {
 	menu.value = defaultMenu;
 });
 </script>
-	
+
 <style scoped lang="scss">
 .menu {
 	align-items: center;
 
 	&__right-element {
+		column-gap: .5rem;
 		margin-left: auto !important;
 		padding: 12px;
 		padding-right: 0;
@@ -110,6 +128,10 @@ watch(() => defaultMenu.value, (defaultMenu) => {
 		&:hover,
 		&:focus {
 			background: none !important;
+		}
+
+		&>.el-button {
+			margin-left: 0;
 		}
 	}
 

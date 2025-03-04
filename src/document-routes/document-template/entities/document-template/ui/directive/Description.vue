@@ -4,7 +4,7 @@
 		:column="1"
 		class="document-template-description"
 	>
-		<el-descriptions-item label="Элемент">
+		<el-descriptions-item label="Тип документа">
 			{{ documentTemplate.type.title }}
 		</el-descriptions-item>
 
@@ -12,12 +12,36 @@
 			{{ documentTemplate.title }}
 		</el-descriptions-item>
 
-		<el-descriptions-item label="Родительский шаблон документа">
-			{{ documentTemplate.parent ? documentTemplate.parent.title : 'отсутствует' }}
+		<el-descriptions-item label="Маршрут шаблона">
+			<el-link
+				:href="`/sed/admin/document-routes/detail/${documentTemplate.route.id}`"
+				:underline="false"
+				type="primary"
+			>
+				{{ documentTemplate.route.title }}
+			</el-link>
+		</el-descriptions-item>
+
+		<el-descriptions-item label="Родительские шаблоны">
+			<el-text
+				type="info"
+				v-if="!documentTemplate.parents.length"
+			>
+				Отсутствуют
+			</el-text>
+			<TemplateList :templates="documentTemplate.parents" />
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Дни исполнения">
-			{{ documentTemplate.data.daysAmount }}
+			<template v-if="documentTemplate.data.days_amount">
+				{{ documentTemplate.data.days_amount }}
+			</template>
+			<el-text
+				type="info"
+				v-else
+			>
+				Отсутствуют
+			</el-text>
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Содержание документа">
@@ -50,11 +74,29 @@
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Автор">
-			<UserLink :user="documentTemplate.data.author" />
+			<Participant
+				:participant="documentTemplate.data.author"
+				v-if="documentTemplate.data.author"
+			/>
+			<el-text
+				type="info"
+				v-else
+			>
+				Отсутствует
+			</el-text>
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Исполнители">
-			<ParticipantListDocTmp :participants="documentTemplate.data.executors" />
+			<ParticipantListDocTmp
+				:participants="documentTemplate.data.executors"
+				v-if="documentTemplate.data.executors.length > 0"
+			/>
+			<el-text
+				type="info"
+				v-else
+			>
+				Отсутствуют
+			</el-text>
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Контроллер">
@@ -87,8 +129,9 @@
 </template>
 
 <script setup>
-import { UserLink, ParticipantListDocTmp } from '@common/shared/ui';
+import { UserLink, ParticipantListDocTmp, Participant } from '@common/shared/ui';
 import { formatDateTime } from '@common/shared/utils';
+import TemplateList from '../TemplateList.vue';
 
 const props = defineProps({
 	documentTemplate: {

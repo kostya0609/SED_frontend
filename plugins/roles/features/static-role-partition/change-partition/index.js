@@ -1,0 +1,1 @@
+export { ChangePartition } from './ui';

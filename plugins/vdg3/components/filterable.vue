@@ -84,8 +84,14 @@ export default {
               return option.value == grid.filter.data[key].value;
             })[0].label;
           showValue.push(obj);
+        } else if (grid.filter.data[key].type == 'string' && grid.filter.data[key].value && grid.filter.data[key].show) {
+          showValue.push({
+             name: grid.filter.data[key].name,
+             value: grid.filter.data[key].value ? grid.filter.data[key].value : ''
+          });
         }
       }
+
       let len = showValue.length - 3;
       showValue.splice(3);
       if (len > 0)
@@ -128,6 +134,7 @@ export default {
       filtered.value = true;
       showFilter.value = false;
     };
+
     function clear() {
       showValue.length = 0;
       if (filtered.value) {
@@ -153,10 +160,14 @@ export default {
               grid.filter.data[key].max = '';
               grid.filter.data[key].operation = '=';
               break;
+            case 'string':
+              grid.filter.data[key].value = '';
+              break;
           }
         }
       }
     };
+
     async function showFilterDropMenu($event) {
       grid.system.filterDropMenu.show = true;
       await nextTick();
@@ -173,12 +184,14 @@ export default {
         grid.system.filterDropMenu.left = $event.clientX;
       document.addEventListener('click', hideFilterDropMenu);
     };
+
     function hideFilterDropMenu($event) {
       if ($event.target.closest('.vdg_filterRow_onDropMenu.' + props.name) == null) {
         grid.system.filterDropMenu.show = false;
         document.removeEventListener('click', hideFilterDropMenu)
       }
     };
+
     function hideFilter($event) {
       if ($event.target.closest('.vdg_filterWrapper.' + props.name) == null && !dontCloseFilter.value && !datePickerOpen.value) {
         showFilter.value = false;
@@ -189,6 +202,7 @@ export default {
       // let filter = document.querySelector('.vdg_filterContentBlock' + props.name);
       // let clickOutSide = $event.composedPath().includes(filter);
     };
+
     async function openFilterWindow() {
       //ниже если загружается дефолтовый фильтр то проверить не осталось ли с прошлой сессии старого #Актуального фильтра и если он есть то удалить его
       if (activeProfile.value === 0) {
@@ -209,6 +223,7 @@ export default {
 
       // подготовить объект фильтра который сейчас настроил пользователь и добавить его к профилям в случае успешного добавления на бэк
       let profileData = {};
+
       for (let key in grid.filter.data) {
         if (grid.filter.data[key].type == 'number' || grid.filter.data[key].type == 'date')
           profileData[key] = {
@@ -218,20 +233,32 @@ export default {
             min: grid.filter.data[key].min,
             max: grid.filter.data[key].max,
             operation: grid.filter.data[key].operation,
-          }
-        else {
+          };
+        if (grid.filter.data[key].type == 'list')
           profileData[key] = {
             name: grid.filter.data[key].name,
             type: grid.filter.data[key].type,
             show: grid.filter.data[key].show,
             value: grid.filter.data[key].value ? grid.filter.data[key].value : [],
             multiple: grid.filter.data[key].multiple,
-          }
-          if (grid.filter.data[key].type == 'list')
-            profileData[key].option = grid.filter.data[key].option ? grid.filter.data[key].option : []
-          else
-            profileData[key].option = grid.filter.data[key].changeOption ? grid.filter.data[key].changeOption : [];
-        }
+            option: grid.filter.data[key].option ? grid.filter.data[key].option : [],          
+          };
+        if (grid.filter.data[key].type == 'searchList')
+          profileData[key] = {
+            name: grid.filter.data[key].name,
+            type: grid.filter.data[key].type,
+            show: grid.filter.data[key].show,
+            value: grid.filter.data[key].value ? grid.filter.data[key].value : [],
+            multiple: grid.filter.data[key].multiple,
+            option: grid.filter.data[key].changeOption ? grid.filter.data[key].changeOption : [],
+          };
+        if (grid.filter.data[key].type == 'string')
+          profileData[key] = {
+            name: grid.filter.data[key].name,
+            type: grid.filter.data[key].type,
+            show: grid.filter.data[key].show,
+            value: grid.filter.data[key].value,
+          };                    
       };
 
       //ниже подготовить новый профиль для отправки на бэк и убрать из него поля которые show = false, чтоб не сохранять их на бэке
@@ -246,6 +273,7 @@ export default {
         grid_id: grid.gridId,
         data: sendProfile,
       });
+
       if (result.status == 'success') {
         grid.filter.profiles.push(
           { id: result.preset_id, name: profileName.value, data: profileData }
@@ -268,6 +296,7 @@ export default {
       // });
       dontCloseFilter.value = true;
     };
+
     async function saveUpdatedProfile(i, id) {
       //ниже подготовить измененный профиль для отправки на бэк и убрать из него поля которые show = false, чтоб не сохранять их на бэке
       let sendProfile = {};
@@ -295,6 +324,7 @@ export default {
 
       dontCloseFilter.value = true;
     };
+
     async function deleteProfile(old_i, id, new_i) {
       let result = await grid.loadJson('/grid/filter/preset/delete', {
         preset_id: id,
@@ -315,6 +345,7 @@ export default {
       // });
       dontCloseFilter.value = true;
     };
+
     async function selectProfile(el, i) {
 
       // for (let prop of Object.getOwnPropertyNames(filterData)) {
@@ -525,16 +556,16 @@ export default {
       let content = []
       for (const [key, dataValue] of Object.entries(this.grid.filter.data)) {
 
-        if (dataValue.type == 'number' && dataValue.show) {
-          content.push(
-            h(
-              'div',
-              { class: 'vdg_filterRow', key: key },
-              [
-                h('label', { class: 'vdg_filterRow_label' }, dataValue.name),
-                h('div',
-                  { class: 'vdg_filterRow_fields' },
-                  [
+       if (dataValue.type == 'number' && dataValue.show) {
+         content.push(
+           h(
+             'div',
+             { class: 'vdg_filterRow', key: key },
+              ()=> [
+                h('label', { class: 'vdg_filterRow_label' }, () => [dataValue.name]),
+               h('div',
+                 { class: 'vdg_filterRow_fields' },
+                  () => [
                     h(resolveComponent('el-select'),
                       {
                         class: 'vdg_filterRow_changeFieldsNumber',
@@ -549,6 +580,7 @@ export default {
                         })
                       }
                     ),
+
                     h(resolveComponent('el-input'),
                       {
                         class: 'vdg_filterRow_changeValue',
@@ -557,6 +589,7 @@ export default {
                         placeholder: 'Введите значение'
                       }
                     ),
+
                     this.grid.filter.data[key].operation == '><' ? h(
                       resolveComponent('el-input'),
                       {
@@ -566,6 +599,7 @@ export default {
                         placeholder: 'Введите значение'
                       }
                     ) : '',
+
                     h(resolveComponent('el-button'),
                       {
                         class: ['vdg_filterRow_hideFields', 'el-button', 'el-button--default'],
@@ -587,10 +621,51 @@ export default {
                 //h('label', {class : 'vdg_filterRow_label'},this.grid.filter.data[key].min),
                 //h('label', {class : 'vdg_filterRow_label'},this.grid.filter.data[key].max)
               ]
+           )
+         )
+       };
+
+        if (dataValue.type == 'string' && dataValue.show) {
+          content.push(
+            h(
+              'div',
+              { class: 'vdg_filterRow', key: key },
+              [
+                h('label', { class: 'vdg_filterRow_label' }, dataValue.name),
+                h('div',
+                  { class: 'vdg_filterRow_fields' },
+                  [
+                    h(resolveComponent('el-input'),
+                      {
+                        class: 'vdg_filterRow_changeValue',
+                        'modelValue': this.grid.filter.data[key].value,
+                        'onUpdate:modelValue': value => { this.grid.filter.data[key].value = value; this.grid.filter.filterValueChange = true },
+                        placeholder: 'Введите строку'
+                      }
+                    ),
+                    h(resolveComponent('el-button'),
+                      {
+                        class: ['vdg_filterRow_hideFields', 'el-button', 'el-button--default'],
+                        onClick: $event => {
+                          this.grid.filter.data[key].show = false;
+                          this.grid.filter.filterValueChange = true;
+                          this.dontCloseFilter = true;
+                        }
+                      },
+                      () => [h(
+                        resolveComponent('el-icon'),
+                        () => [h(Close),]
+                      )]
+                    ),
+                  ]
+                ),
+                // для проверки корректности работы v-model
+                //h('label', {class : 'vdg_filterRow_label'},this.grid.filter.data[key].value),
+              ]
             )
           )
         };
-
+        
         if (dataValue.type == 'date' && dataValue.show) {
           content.push(
             h('div',
@@ -728,7 +803,7 @@ export default {
                         multiple: dataValue.multiple,
                         filterable: true,
                         remote: true,
-                        reserveKeyword: true,
+                        reserveKeyword: false,
                         loading: false,
                         remoteMethod: async (query) => {
                           if (!query) return;
@@ -895,7 +970,7 @@ export default {
                 {},
                 [
                   h(resolveComponent('el-scrollbar'), { class: 'vdg_filterMainContainer_scrollbar' },
-                    h('div', { class: 'vdg_filterMainContainer' }, filterMain())
+                    () => h('div', { class: 'vdg_filterMainContainer' }, filterMain())
                   ),
                   h('div', { class: 'vdg_filterButtonContainer' }, [
                     h('div', { class: 'vdg_filterRow_fields' },
@@ -917,9 +992,10 @@ export default {
                         class: ['vdg_filterRow_submitFilter', 'el-button', 'el-button--primary'],
                         onClick: $event => { this.onSubmit() }
                       },
-                      'Найти'
+                      () => ['Найти']
                     ),
                   ])
+                  
                 ],
               ),
             ],

@@ -1,0 +1,1 @@
+export { usePartitionTree } from '@document-routes/partition/entities/partition';

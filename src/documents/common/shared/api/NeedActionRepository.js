@@ -1,5 +1,8 @@
 import { BaseRepository } from "@common/shared/api/BaseRepository";
 
+/**
+ * TODO: Возможно, не используется в текущем проекте
+ */
 export class NeedActionRepository extends BaseRepository {
     constructor() {
         super();

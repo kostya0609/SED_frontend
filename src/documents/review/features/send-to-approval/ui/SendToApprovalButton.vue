@@ -10,10 +10,8 @@
 </template>
 <script setup>
 
-import { ReviewRepo } from "@documents/review/entities/review/api";
-import { inject } from "vue";
-
-const processRef = inject('processRef');
+import { useProcess } from "@/plugins/process";
+import { useActiveTab, useDocument } from "@documents/review/entities/review";
 
 const props = defineProps({
 	type: {
@@ -25,10 +23,15 @@ const props = defineProps({
 	},
 });
 
+const { sendToApproval } = useDocument();
+const { reloadProcess } = useProcess();
+const { setActiveTab } = useActiveTab();
+
 const handleClick = async () => {
-	await ReviewRepo.sendToApproval(props.documentId);
-	// TODO: Исправить косяк с обновлением процесса
-	// processRef.value.updateProcess();
-	location.reload();
+
+	await sendToApproval(props.documentId);
+	await reloadProcess();
+	setActiveTab('process');
+
 };
 </script>

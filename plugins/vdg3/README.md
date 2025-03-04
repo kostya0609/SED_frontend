@@ -329,6 +329,12 @@ onUnmounted(()=>{
             if (result.status === 'success' && result.data) return result.data;
           },
         },
+	status_title: {
+	  show: true,
+      	  type: 'string',
+    	  name: 'Статус документа',
+      	  value: '',  
+	},
 	year: {
           show: true,
           type: 'list',

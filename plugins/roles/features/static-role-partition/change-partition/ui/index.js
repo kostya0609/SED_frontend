@@ -1,0 +1,1 @@
+export { default as ChangePartition } from './ChangePartition.vue';

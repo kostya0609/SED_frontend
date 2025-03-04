@@ -1,11 +1,29 @@
 <template>
-	<BaseTable v-bind="{ ...$attrs, data, total, customizable }">
+	<BaseTable
+		v-bind="{ ...$attrs, data, total, customizable }"
+		v-model:current-page="currentPage"
+	>
 		<template #prepend-header>
+			<slot name="prepend-header" />
 			<FilterButton
 				:filter="filter"
+				@change="goToFirstOnePage"
 				v-if="filterable"
 			/>
-			<Search v-if="searchable" />
+			<Search
+				class="bsi-table-search-field"
+				@change="goToFirstOnePage"
+				v-if="searchable"
+			/>
+		</template>
+		<template #append-header>
+			<slot name="append-header" />
+		</template>
+		<template #append-footer>
+			<slot name="append-footer" />
+		</template>
+		<template #prepend-footer>
+			<slot name="prepend-footer" />
 		</template>
 		<slot />
 	</BaseTable>
@@ -21,6 +39,7 @@ import { Search } from '../features/search';
 
 const moduleName = injectLocal('moduleName');
 const userId = injectLocal('userId');
+const variableStore = injectLocal('table-local-store');
 
 const props = defineProps({
 	change: {
@@ -52,13 +71,25 @@ const props = defineProps({
 });
 
 const store = useStorage(props.storage);
+
 const emitter = useEventEmitter();
 const { getSettings, settingsMerge } = useSetting();
 
 const data = defineModel('data', { default: [] });
 const total = defineModel('total', { default: 0 });
+const currentPage = ref(1);
+
 const loading = ref(false);
 
+const goToFirstOnePage = () => {
+	currentPage.value = 1;
+
+	emitter.emit('state-save', {
+		paginate: {
+			page: currentPage.value,
+		}
+	}, 'local');
+};
 
 const emitChangeEvent = async () => {
 	try {
@@ -67,7 +98,14 @@ const emitChangeEvent = async () => {
 		}
 
 		loading.value = true;
-		const result = await props.change(getSettings());
+
+		const currentSettings = JSON.parse(JSON.stringify(getSettings()));
+
+		emitter.emit('before-change-data', currentSettings, (newSettings) => {
+			Object.assign(currentSettings, newSettings);
+		});
+
+		const result = await props.change(currentSettings);
 
 		if (result) {
 			data.value = result.data;
@@ -91,13 +129,22 @@ emitter.on('state-loaded', async (state) => {
 	await emitChangeEvent();
 });
 
-emitter.on('state-save', async (state) => {
-	await store.save({
-		moduleName: moduleName,
-		tableId: props.id,
-		userId: userId,
-		data: state,
-	});
+emitter.on('state-save', async (state, storageType) => {
+	if (storageType === 'local') {
+		await variableStore.save({
+			moduleName: moduleName,
+			tableId: props.id,
+			userId: userId,
+			data: state,
+		});
+	} else {
+		await store.save({
+			moduleName: moduleName,
+			tableId: props.id,
+			userId: userId,
+			data: state,
+		});
+	}
 });
 
 emitter.on('change-data', async (state) => {
@@ -106,12 +153,20 @@ emitter.on('change-data', async (state) => {
 	await emitChangeEvent();
 });
 
+const state = await store.get(moduleName, props.id, userId);
+const variableState = await variableStore.get(moduleName, props.id, userId);
+
 onMounted(async () => {
-	const state = await store.get(moduleName, props.id, userId);
+	settingsMerge(variableState);
 	settingsMerge(state);
+
 	emitter.emit('state-loaded', getSettings());
 });
 
 provideLocal('emitter', emitter);
 provideLocal('loading', loading);
+
+defineExpose({
+	forceUpdate: emitChangeEvent,
+});
 </script>

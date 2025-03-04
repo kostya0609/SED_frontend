@@ -11,7 +11,7 @@ export const useRenderColumns = () => {
 		const columnsNames = columnsObjects.value.filter(col => col.is_active).map(col => col.prop);
 
 		const columns = columnsComponents.value
-			.filter(component => columnsNames.includes(component.props.prop))
+			.filter(component => component.props && columnsNames.includes(component.props.prop))
 			.map(component => {
 				const columnObject = columnsObjects.value.find(column => column.prop === component.props.prop);
 				component.props = {
@@ -38,9 +38,17 @@ export const useRenderColumns = () => {
 		}
 
 		const item = slots[0];
-		
+
+		if (typeof item.type === 'symbol') {
+			return slots;
+		}
+
 		if (item.type.__name === 'BsiTableColumn') {
 			return slots;
+		}
+
+		if (!Array.isArray(item.children)) {
+			return [item];
 		}
 
 		return getColumns(item.children);

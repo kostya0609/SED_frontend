@@ -7,16 +7,11 @@ export class StaticRoleRepository extends BaseRepository {
     }
     
 	/**
-    * @param {{
-	*   count: number;
-	*   page: number;
-	* }} payload
 	* @return {Promise<any>}
 	*/
-	async getAll(payload) {
+	async getTree() {
 		const result = await this._query({
-            payload,
-            nestedEndpoint : 'statics/list'
+            nestedEndpoint : 'statics/get-tree'
         });
         if (!result.success)
             throw new Error(result.message);
@@ -113,6 +108,26 @@ export class StaticRoleRepository extends BaseRepository {
             throw new Error(result.message);
 
         return result.data;
+	}
+
+    /**
+	 * @param {{user_id: number, parent_id: number}} payload
+	 * @return {Promise<any>}
+	 */
+	async getRoleByParentId(payload) {
+		const result = await this._query({
+			payload,
+			nestedEndpoint: 'statics/get-static-role-by-parent-id'
+		});
+		if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
+
+		return result.data;
 	}
 
 }

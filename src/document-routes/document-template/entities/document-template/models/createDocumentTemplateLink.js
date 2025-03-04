@@ -6,6 +6,8 @@ import { DOCUMENT_TEMPLATE_TYPE } from '@document-routes/common/shared/constants
  * @param {'create'|'detail'|'edit'} operation 
  * @param {number} documentTemplateId 
  * @returns {string}
+ * 
+ * @TODO: Переделать входящие параметры на объект
  */
 export const createDocumentTemplateLink = (documentTemplateTypeId, operation, documentTemplateId = null, documentRouteId = null) => {
 

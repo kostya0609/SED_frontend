@@ -2,6 +2,7 @@
 	<el-select
 		v-model="value"
 		clearable
+		default-first-option
 		@change="handleChange"
 		@clear="() => { value = null }"
 	>
@@ -21,10 +22,12 @@ const props = defineProps({
 const value = defineModel();
 const modelValue = defineModel('value');
 
+
 const OPERATOR_GROUP = {
 	NUMBER_DATETIME: 1,
 	STRING: 2,
 	COMMON: 3,
+	SEARCH: 4,
 };
 
 const operators = [
@@ -83,7 +86,6 @@ const operators = [
 		title: 'Заканчивается на',
 		group_id: OPERATOR_GROUP.STRING,
 	},
-
 	{
 		id: 12,
 		title: 'Пусто',
@@ -93,6 +95,11 @@ const operators = [
 		id: 13,
 		title: 'Не пусто',
 		group_id: OPERATOR_GROUP.COMMON,
+	},
+	{
+		id: 14,
+		title: 'Выбрать',
+		group_id: OPERATOR_GROUP.SEARCH,
 	},
 ];
 
@@ -106,6 +113,15 @@ const fieldOperators = operators.filter(({ group_id }) => {
 
 		case 'number':
 			return [OPERATOR_GROUP.NUMBER_DATETIME, OPERATOR_GROUP.COMMON].includes(group_id);
+
+		case 'search-user':
+			return [OPERATOR_GROUP.SEARCH].includes(group_id);
+
+		case 'search-department':
+			return [OPERATOR_GROUP.SEARCH].includes(group_id);
+
+		case 'select-options':
+			return [OPERATOR_GROUP.SEARCH].includes(group_id);
 
 		default:
 			console.warn(`Нет обработки для типа поля ${props.type}`);

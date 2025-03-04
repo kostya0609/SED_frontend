@@ -1,6 +1,7 @@
 <template>
     <div>
         <el-link
+            v-if="!disablePhoto"
             :underline="false"
             :href="user.link"
             target="_blank"
@@ -12,7 +13,7 @@
             :href="user.link"
             target="_blank"
         >
-            {{ user.full_name }}
+        {{ fullName ? user.full_name : user.abbreviated_name}}
         </el-link>
     </div>
 </template>
@@ -24,6 +25,14 @@ defineProps({
         type: Object,
         required: true
     },
+    disablePhoto: {
+		type: Boolean,
+		default: false,
+	},
+	fullName: {
+		type: Boolean,
+		default: true,
+	}
 })
 
 </script>

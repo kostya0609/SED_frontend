@@ -16,16 +16,27 @@
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Тема">
-			{{ document.theme }}
+			<ThemeWithAdminLinks
+				:template-document="document.template_document"
+				:theme-title="document.theme"
+			/>
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Дата создания">
 			{{ formatDateTime(document.created_at) }}
 		</el-descriptions-item>
 
-		<el-descriptions-item label="Документ основания">
-			<template v-if="document.parent">
-				{{ document.parent.number }}
+		<el-descriptions-item label="Документ основание">
+			<template v-if="document.parent_document">
+				<el-link
+					:underline="false"
+					:href="createDocumentLink(document.parent_document.type_id, 'detail', document.parent_document.document_id)"
+					target="_blank"
+					type="primary"
+					@click="() => setDocumentId(document.parent_document.id)"
+				>
+					{{ document.parent_document.number }}
+				</el-link>
 			</template>
 			<el-text
 				type="info"
@@ -37,6 +48,19 @@
 
 		<el-descriptions-item label="Содержание документа">
 			{{ document.contents.content }}
+		</el-descriptions-item>
+
+		<el-descriptions-item label="Основные файлы">
+			<AttachmentList
+				v-if="document.main_files.length > 0"
+				:attachments="document.main_files"
+			/>
+			<el-text
+				type="info"
+				v-else
+			>
+				Отсутствуют
+			</el-text>
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Описание портфеля документов">
@@ -56,22 +80,17 @@
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Ознакамливающиеся">
-			<ParticipantList :participants="document.receivers" />
-		</el-descriptions-item>
-
-		<el-descriptions-item label="Основные файлы">
-			<AttachmentList
-				v-if="document.main_files.length > 0"
-				:attachments="document.main_files"
+			<ParticipantList
+				:participants="document.receivers"
+				v-if="document.receivers.length"
 			/>
 			<el-text
-				type="info"
+				type="danger"
 				v-else
 			>
-				Отсутствуют
+				ОТСУТСТВУЮТ (НЕОБХОДИМО УКАЗАТЬ)
 			</el-text>
 		</el-descriptions-item>
-
 	</el-descriptions>
 
 </template>
@@ -79,6 +98,9 @@
 <script setup>
 import { UserLink, ParticipantList, AttachmentList } from '@/common/shared/ui';
 import { formatDateTime } from '@/common/shared/utils';
+import { createDocumentLink } from '@documents/common/entities/document/';
+import { ThemeWithAdminLinks } from '@/documents/common/features/theme-with-admin-links';
+import { setDocumentId } from '@documents/common/features/selected-document-ids';
 
 defineProps({
 	document: Object,

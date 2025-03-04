@@ -13,7 +13,7 @@ export const accessMenu = [
 			},
 			{
 				icon: 'Back',
-				path: '/sed/admin/document-routes',
+				path: '/sed/admin/document-routes/list-v2',
 				type: 'default'
 			},
 		],
@@ -29,7 +29,7 @@ export const accessMenu = [
 			},
 			{
 				icon: 'Back',
-				path: '/sed/admin/document-routes',
+				path: '/sed/admin/document-routes/list-v2',
 				type: 'default'
 			},
 		],
@@ -45,7 +45,7 @@ export const accessMenu = [
 			},
 			{
 				icon: 'Back',
-				path: '/sed/admin/document-routes',
+				path: '/sed/admin/document-routes/list-v2',
 				type: 'default'
 			},
 		],
@@ -57,34 +57,11 @@ export const accessMenu = [
  * @type {import('@/plugins/menu/types').Menu}
  */
 export const adminMenu = [
-
 	{
 		title: 'Маршруты',
-		path: '/sed/admin/document-routes/list',
+		path: '/sed/admin/document-routes/list-v2',
 		rights: ['full_access'],
-		buttons: [
-			{
-				title: 'Создать маршрут',
-				path: '/sed/admin/document-routes/create',
-			},
-			{
-				icon: 'Back',
-				path: '/sed/',
-				type: 'default'
-			},
-		],
-	},
-	{
-		title: 'Структура маршрутов',
-		path: '/sed/admin/document-routes/partition/tree',
-		
-		buttons: [
-			{
-				icon: 'Back',
-				path: '/sed/',
-				type: 'default'
-			},
-		],
+		buttons: [],
 	},
 	{
 		title: 'Динамические роли',
@@ -103,25 +80,25 @@ export const adminMenu = [
 	},
 	{
 		title: 'Статичные роли',
-		path: '/sed/admin/roles/statics',
+		path: '/sed/admin/roles/statics-v2',
+		buttons: [],
+	},	
+	{
+		title: 'Управление правами',
+		path: '/sed/admin/access/group/list',
+		replaceMenu: accessMenu,
+	},
+	{
+		title: 'Отчет',
+		path: '/sed/admin/report',
 		buttons: [
-			{
-				title: 'Создать роль',
-				path: '/sed/admin/roles/statics/create',
-			},
 			{
 				icon: 'Back',
 				path: '/sed/',
 				type: 'default'
 			},
 		],
-	},
-	{
-		title: 'Управление правами',
-		path: '/sed/admin/access/group/list',
-		replaceMenu: accessMenu,
-	},
-
+	}
 ];
 
 
@@ -132,27 +109,71 @@ export const menu = [
 	{
 		title: 'СЭД',
 		path: '/sed/',
-		buttons: [
-			{
-				title: 'Создать документ',
-				path: '/sed/documents/select-route-element',
-			},
-		],
+		dropdown: {
+			title: 'Создать документ',
+			items: [
+				{
+					title: 'ЭСЗ',
+					path: '/sed/documents/esz/create',
+				},
+				{
+					title: 'Поручение',
+					path: '/sed/documents/directive/create',
+				},
+				{
+					title: 'Ознакомление',
+					path: '/sed/documents/review/create',
+				},
+			],
+		},
 	},
 	{
 		title: 'Требует реакции',
 		path: '/sed/need-action',
 		count: 0,
-		buttons: [
-			{
-				title: 'Создать документ',
-				path: '/sed/documents/select-route-element',
-			},
-		],
+		dropdown: {
+			title: 'Создать документ',
+			items: [
+				{
+					title: 'ЭСЗ',
+					path: '/sed/documents/esz/create',
+				},
+				{
+					title: 'Поручение',
+					path: '/sed/documents/directive/create',
+				},
+				{
+					title: 'Ознакомление',
+					path: '/sed/documents/review/create',
+				},
+			],
+		},
+	},
+	{
+		title: 'Требует реакции (зам.)',
+		path: '/sed/need-action-subuser',
+		count: 0,
+		dropdown: {
+			title: 'Создать документ',
+			items: [
+				{
+					title: 'ЭСЗ',
+					path: '/sed/documents/esz/create',
+				},
+				{
+					title: 'Поручение',
+					path: '/sed/documents/directive/create',
+				},
+				{
+					title: 'Ознакомление',
+					path: '/sed/documents/review/create',
+				},
+			],
+		},
 	},
 	{
 		title: 'Администрирование',
-		path: '/sed/admin/document-routes/list',
+		path: '/sed/admin/document-routes/list-v2',
 		rights: ['full_access'],
 		replaceMenu: adminMenu,
 	},

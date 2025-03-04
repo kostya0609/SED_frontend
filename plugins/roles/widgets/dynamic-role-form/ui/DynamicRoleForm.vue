@@ -81,7 +81,7 @@ const formData = reactive({
   id: null,
   title: null,
   description: null,
-  is_active: 1,
+  is_active: true,
 });
 
 const submit = async () => {

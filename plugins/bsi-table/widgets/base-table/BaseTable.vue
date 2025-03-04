@@ -8,6 +8,7 @@
 				v-if="customizable"
 			/>
 			<el-pagination
+				class="bsi-table__pagination"
 				layout="jumper, prev, pager, next, sizes, total"
 				@size-change="handlePaginateSizeChange"
 				@current-change="handlePaginateCurrentChange"
@@ -15,7 +16,6 @@
 				v-model:page-size="perPage"
 				:page-sizes="paginate.pageSizes"
 				:total="total"
-				v-if="total"
 			/>
 			<slot name="append-header" />
 		</div>
@@ -32,7 +32,9 @@
 		</div>
 
 		<div class="bsi-table__footer">
+			<slot name="prepend-footer" />
 			<el-pagination
+				class="bsi-table__pagination"
 				layout="jumper, prev, pager, next, sizes, total"
 				@size-change="handlePaginateSizeChange"
 				@current-change="handlePaginateCurrentChange"
@@ -40,8 +42,8 @@
 				v-model:page-size="perPage"
 				:page-sizes="paginate.pageSizes"
 				:total="total"
-				v-if="total"
 			/>
+			<slot name="append-footer" />
 		</div>
 	</div>
 </template>
@@ -58,6 +60,7 @@ const loading = injectLocal('loading');
 
 const data = defineModel('data', { default: [] });
 const _total = defineModel('total', { default: 0 });
+const currentPage = defineModel('currentPage', { default: 1 });
 
 const props = defineProps({
 	customizable: { type: Boolean, default: true },
@@ -72,7 +75,7 @@ const paginate = reactive({
 	pageSizes: [10, 20, 50],
 });
 
-const { currentPage, perPage, total } = usePaginate(paginate.currentPage, paginate.pageSizes[0], _total.value);
+const { perPage, total } = usePaginate(paginate.currentPage, paginate.pageSizes[0], _total.value);
 const { renderColumns, columnsObjects } = useRenderColumns();
 
 const handlePaginateSizeChange = (perPage) => {
@@ -87,10 +90,16 @@ const handlePaginateSizeChange = (perPage) => {
 };
 
 const handlePaginateCurrentChange = (currentPage) => {
-	emitter.emit('change-data', {
+	emitter.emit('state-save', {
 		paginate: {
 			page: currentPage,
+		}
+	}, 'local');
+
+	emitter.emit('change-data', {
+		paginate: {
 			perPage: perPage.value,
+			page: currentPage,
 		}
 	});
 };
@@ -138,6 +147,7 @@ onMounted(() => {
 
 		if (state.paginate) {
 			perPage.value = state.paginate.perPage;
+			currentPage.value = state.paginate.page || 1;
 		}
 
 		if (state.sort) {
@@ -161,15 +171,25 @@ watch(() => _total.value, (_total) => {
 </script>
 <style scoped lang="scss">
 .bsi-table {
-	&__header {
+
+	&__header,
+	&__footer {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
 		padding-bottom: .5rem;
+
+		&:deep(.el-button+.el-button) {
+			margin-left: 0;
+		}
 	}
 
 	&__footer {
 		padding-top: .5rem;
+	}
+
+	&__pagination {
+		margin-left: auto;
 	}
 }
 

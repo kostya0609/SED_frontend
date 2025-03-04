@@ -4,43 +4,9 @@
 		prop="title"
 	>
 		<el-input
-			v-model="formData.title"
-			type="textarea"
-			:rows="1"
+			v-model="formData.title"			
 			placeholder="Введите название маршрута"
 		/>
-	</el-form-item>
-	<el-form-item
-		label="Группа"
-		prop="group_id"
-	>
-		<el-select
-			v-model="formData.group_id"
-			placeholder="Выбрать группу"
-		>
-			<el-option
-				v-for="group in additionalData.groups"
-				:key="group.id"
-				:label="group.title"
-				:value="group.id"
-			/>
-		</el-select>
-	</el-form-item>
-	<el-form-item
-		label="Направление"
-		prop="direction_id"
-	>
-		<el-select
-			v-model="formData.direction_id"
-			placeholder="Выбрать направление"
-		>
-			<el-option
-				v-for="direction in additionalData.directions"
-				:key="direction.id"
-				:label="direction.title"
-				:value="direction.id"
-			/>
-		</el-select>
 	</el-form-item>
 	<el-form-item
 		label="Раздел"

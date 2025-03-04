@@ -10,6 +10,15 @@
 			</template>
 		</el-table-column>
 		<el-table-column
+			prop="process_template_name"
+			label="Название процесса"
+		>
+			<template #default="{ row }">
+				{{ row.process_template_name }}
+			</template>
+
+		</el-table-column>
+		<el-table-column
 			prop="event"
 			label="Решение"
 		>
@@ -49,10 +58,22 @@
 
 		<el-table-column
 			prop="user.user"
-			width="350"
+			width="400"
 		>
 			<template #default="{ row }">
-				<UserLink :user="row.user" />
+				<div class="process-history__user-wrapper">
+					<div
+						v-if="row.subuser"
+						class="process-history__subuser"
+					>
+						<UserLink :user="row.subuser" />&nbsp;за
+					</div>
+					<UserLink
+						:user="row.user"
+						class="process-history__user"
+						:class="{ 'process-history__user--with-subuser': !!row.subuser }"
+					/>
+				</div>
 			</template>
 		</el-table-column>
 
@@ -70,5 +91,25 @@ import { UserLink } from '.';
 	margin: 0;
 	padding: 0;
 	list-style: none;
+}
+
+.process-history {
+	&__user-wrapper {
+		display: flex;
+		flex-direction: column;
+		gap: .25rem;
+	}
+
+	&__user {
+		&--with-subuser {
+			margin-left: 2rem;
+		}
+	}
+
+	&__subuser {
+		display: flex;
+		align-items: center;
+		font-style: italic;
+	}
 }
 </style>

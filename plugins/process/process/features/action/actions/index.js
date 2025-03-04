@@ -1,0 +1,12 @@
+export { default as AttractAction } from './AttractAction.vue';
+export { default as CustomAction } from './CustomAction.vue';
+export { default as MakeCommentAndNotifyAntotherEmployee } from './MakeCommentAndNotifyAntotherEmployee.vue';
+export { default as MakeCommentAndNotifyExecutor } from './MakeCommentAndNotifyExecutor.vue';
+export { default as MakeCommentAndNotifyExecutorDocument } from './MakeCommentAndNotifyExecutorDocument.vue';
+export { default as NegativeAction } from './NegativeAction.vue';
+export { default as PositiveAction } from './PositiveAction.vue';
+export { default as PostCommentAction } from './PostCommentAction.vue';
+export { default as RequestCancellation } from './RequestCancellation.vue';
+export { default as RequestChangeDeadline } from './RequestChangeDeadline.vue';
+export { default as RequestExecutorChange } from './RequestExecutorChange.vue';
+export { default as SkipAction } from './SkipAction.vue';

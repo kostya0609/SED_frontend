@@ -1,5 +1,5 @@
 <template>
-    <h3>Cоздание маршрута</h3>
+    <h3 class="header_h3">Cоздание маршрута</h3>
     <Form mode="create" />
 </template>
 

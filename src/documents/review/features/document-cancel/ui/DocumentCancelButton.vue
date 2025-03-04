@@ -10,6 +10,8 @@
 </template>
 <script setup>
 import { ElMessageBox } from 'element-plus';
+import { useProcess } from "@/plugins/process";
+
 import { useDocument } from "@documents/review/entities/review";
 
 const props = defineProps({
@@ -20,6 +22,7 @@ const props = defineProps({
 });
 
 const { cancel } = useDocument();
+const { reloadProcess } = useProcess();
 
 const handleClick = async () => {
 	await ElMessageBox.confirm(`Вы уверены, что хотите аннулировать документ?`, {
@@ -30,6 +33,7 @@ const handleClick = async () => {
 			}
 
 			await cancel(props.document_id);
+			await reloadProcess();
 		},
 	});
 };

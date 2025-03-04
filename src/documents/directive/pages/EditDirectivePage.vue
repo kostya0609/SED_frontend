@@ -16,12 +16,21 @@ import { useBackButton } from '@/plugins/menu';
 import { ref } from "vue";
 import { useDocument } from '@documents/directive/entities/directive';
 
+const route = useRoute();
 const { document, initDocument } = useDocument();
 
-const route = useRoute();
+const props = defineProps({
+	hideBackButton: {
+		type: Boolean,
+		default: false,
+	}
+});
+
 const loading = ref(false);
 
 await initDocument(route.params.id);
 
-useBackButton({ fallbackPath: '/sed' });
+if (!props.hideBackButton) {
+	useBackButton({ fallbackPath: '/sed' });
+}
 </script>

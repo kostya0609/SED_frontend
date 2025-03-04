@@ -3,50 +3,59 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import progress from 'vite-plugin-progress';
 import TurboConsole from 'unplugin-turbo-console/vite';
+import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    progress(),
-    TurboConsole(),
-  ],
-  resolve: {
-    alias: {
-      '@/plugins': fileURLToPath(new URL('./plugins', import.meta.url)),
-      
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@common': fileURLToPath(new URL('./src/common', import.meta.url)),
+	plugins: [
+		vue(),
+		progress(),
+		TurboConsole(),
+		vueDevTools(),
+	],
+	css: {
+		preprocessorOptions: {
+			scss: {
+				api: 'modern-compiler',
+			}
+		}
+	},
+	resolve: {
+		alias: {
+			'@/plugins': fileURLToPath(new URL('./plugins', import.meta.url)),
 
-      '@documents': fileURLToPath(new URL('./src/documents', import.meta.url)),
-      '@documents/directive': fileURLToPath(new URL('./src/documents/directive', import.meta.url)),
-      '@documents/esz': fileURLToPath(new URL('./src/documents/esz', import.meta.url)),
-      '@documents/review': fileURLToPath(new URL('./src/documents/review', import.meta.url)),
+			'@': fileURLToPath(new URL('./src', import.meta.url)),
+			'@common': fileURLToPath(new URL('./src/common', import.meta.url)),
 
-      '@document-routes': fileURLToPath(new URL('./src/document-routes', import.meta.url)),
+			'@documents': fileURLToPath(new URL('./src/documents', import.meta.url)),
+			'@documents/directive': fileURLToPath(new URL('./src/documents/directive', import.meta.url)),
+			'@documents/esz': fileURLToPath(new URL('./src/documents/esz', import.meta.url)),
+			'@documents/review': fileURLToPath(new URL('./src/documents/review', import.meta.url)),
 
-      '@report': fileURLToPath(new URL('./src/report', import.meta.url)),
-    }
-  },
-  build: {
-    cssCodeSplit: false,
-    rollupOptions: {
-      output: {
-        assetFileNames: (assetInfo) => {
-          let extType = assetInfo.name.split('.').at(1);
+			'@document-routes': fileURLToPath(new URL('./src/document-routes', import.meta.url)),
 
-          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-            extType = 'images';
-          }
+			'@report': fileURLToPath(new URL('./src/report', import.meta.url)),
+		}
+	},
+	build: {
+		cssCodeSplit: false,
+		rollupOptions: {
+			output: {
+				assetFileNames: (assetInfo) => {
+					let extType = assetInfo.name.split('.').at(1);
 
-          return `${extType}/[name]-[hash][extname]`;
-        },
+					if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+						extType = 'images';
+					}
 
-        chunkFileNames: 'js/[name]-[hash].js',
+					return `${extType}/[name]-[hash][extname]`;
+				},
 
-        entryFileNames: 'js/[name]-[hash].js',
-        manualChunks: () => 'index.js',
-      }
-    }
-  },
+				chunkFileNames: 'js/[name]-[hash].js',
+
+				entryFileNames: 'js/[name]-[hash].js',
+				manualChunks: () => 'index.js',
+			}
+		}
+	},
 });

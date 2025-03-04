@@ -8,9 +8,11 @@
 </template>
 <script setup>
 import { useDocument } from '@documents/directive/entities/directive';
+import { useProcess } from "@/plugins/process";
 import { ElMessageBox } from 'element-plus';
 
 const { cancel } = useDocument();
+const { reloadProcess } = useProcess();
 
 const props = defineProps({
 	documentId: Number,
@@ -25,6 +27,7 @@ const handleClick = async () => {
 			}
 
 			await cancel(props.documentId);
+			await reloadProcess();
 		},
 	});
 };

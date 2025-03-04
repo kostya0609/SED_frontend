@@ -13,12 +13,9 @@ export class DocumentRepository extends BaseRepository {
 	async getAll(payload) {
 		const result = await this._query({
 			payload,
-			nestedEndpoint: 'documents/list',
+			nestedEndpoint: 'documents/list-v2',
 		});
-
-		if (!result.success)
-			throw new Error(result.message);
-
+		this._handleError(result);
 		return result.data;
 	}
 
@@ -27,18 +24,26 @@ export class DocumentRepository extends BaseRepository {
 	*  @return {Promise<any>}
 	*/
 	async getNeedAction(payload) {
-
 		const result = await this._query({
 			payload,
-			nestedEndpoint: 'documents/list',
-			//nestedEndpoint: 'documents/need-action-list',
+			nestedEndpoint: 'documents/need-action-list-v2',
 		});
-
-		if (!result.success)
-			throw new Error(result.message);
-
+		this._handleError(result);
 		return result.data;
 	}
+
+	/**
+	*  @param {import('@/common/shared/types/repository').FilterDTO} payload
+	*  @return {Promise<any>}
+	*/
+	async getNeedActionSubuser(payload) {
+		const result = await this._query({
+			payload,
+			nestedEndpoint: 'documents/need-action-subuser-list-v2',
+		});
+		this._handleError(result);
+		return result.data;
+	}	
 
 	/**
 	 * @param {{documentId: number}} payload
@@ -49,10 +54,7 @@ export class DocumentRepository extends BaseRepository {
 			payload,
 			nestedEndpoint: 'documents/delete',
 		});
-
-		if (!result.success)
-			throw new Error(result.message);
-
+		this._handleError(result);
 		return result;
 	}
 
@@ -67,10 +69,37 @@ export class DocumentRepository extends BaseRepository {
 				user_id: window._userId
 			}
 		});
-
-		if (!result.success)
-			throw new Error(result.message);
-
+		this._handleError(result);
 		return result.data.count;
+	}
+
+	/**
+	 * @return {Promise<number>}
+	 */
+	async getNeedActionSubuserCount() {
+		const result = await this._query({
+			nestedEndpoint: 'documents/need-action-subuser-count',
+			payload: {
+				/** TODO: Костыль для того, чтобы передать id пользователя. В базовом методе _query некорректно реализована логика проверки payload */
+				user_id: window._userId
+			}
+		});
+		this._handleError(result);
+		return result.data.count;
+	}
+
+	/**
+	 * @return {Promise<string>}
+	 */
+	async getAllStatuses() {
+		const result = await this._query({
+			nestedEndpoint: 'documents/get-all-statuses',
+			payload: {
+				/** TODO: Костыль для того, чтобы передать id пользователя. В базовом методе _query некорректно реализована логика проверки payload */
+				user_id: window._userId
+			}
+		});
+		this._handleError(result);
+		return result.data;
 	}
 }

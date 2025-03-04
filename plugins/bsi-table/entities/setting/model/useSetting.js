@@ -22,6 +22,10 @@ export const useSetting = () => {
 			settings.filter = state.filter;
 		}
 
+		if (state.search) {
+			settings.search = state.search;
+		}
+
 		if (state.paginate) {
 			settings.paginate = {
 				...settings.paginate,

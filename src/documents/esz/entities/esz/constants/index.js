@@ -51,5 +51,11 @@ export const DOCUMENT_STATUS = {
 	 * Архив аннулированно
 	 * @type {number}
 	 */
-	ARCHIVE_CANCELLED: 9
+	ARCHIVE_CANCELLED: 9,
+
+	/**
+	 * Черновик
+	 * @type {number}
+	 */
+	DRAFT: 10,
 };

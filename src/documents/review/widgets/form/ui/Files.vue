@@ -2,7 +2,7 @@
 	<h3 class="header_h3">Основные файлы</h3>
 	<el-form-item
 		class="form__item"
-		props="main"
+		prop="main"
 	>
 		<UploadFile
 			v-model:file-list="formData.main"
@@ -13,7 +13,7 @@
 	<h3 class="header_h3">Описание портфеля документов</h3>
 	<el-form-item
 		class="form__item"
-		props=portfolio
+		prop=portfolio
 	>
 		<el-input
 			v-model="formData.portfolio"
@@ -37,13 +37,9 @@ defineProps({
 
 <style scoped lang="scss">
 .form {
-	&__item {}
-
 	&__item.is-error ::v-deep(.el-upload-dragger) {
 		border-color: red;
 		border-style: solid;
 	}
-
-	&__input {}
 }
 </style>

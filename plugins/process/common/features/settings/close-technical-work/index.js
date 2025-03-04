@@ -1,0 +1,1 @@
+export { default as CloseTechnicalWork } from './CloseTechnicalWork.vue';

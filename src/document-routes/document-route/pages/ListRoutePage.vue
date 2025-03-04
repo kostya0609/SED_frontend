@@ -1,69 +1,88 @@
 <template>
 	<BsiTable
-		filterable
 		searchable
+		filterable
 		border
 		:change="handleChangeSettings"
+		:filter="filter"
 		storage="local"
 		id="documet-routes-table"
-		scrollbar-always-on
 	>
 		<BsiTableColumn
 			prop="_actions"
 			align="center"
-			width="120"
+			width="150"
 			v-slot="{ row }"
 		>
-			<el-button-group>
-				<el-button
-					icon="Document"
-					type="primary"
-					size="small"
-					@click="$router.push({ name: 'detailDocumentRoutePage', params: { id: row.id } });"
-				/>
-				<el-button
-					icon="Edit"
-					type="primary"
-					size="small"
-					@click="$router.push({ name: 'editDocumentRoutePage', params: { id: row.id } });"
-				/>
-			</el-button-group>
+			<el-dropdown
+				split-button
+				trigger="click"
+				@click="goTo(row.id)"
+				@command="(command) => handleDropdownCommand(command, row.id)"
+			>
+				Перейти
+				<template #dropdown>
+					<el-dropdown-menu>
+						<el-dropdown-item
+							command="edit"
+							icon="Edit"
+						>
+							Редактировать
+						</el-dropdown-item>
+					</el-dropdown-menu>
+				</template>
+			</el-dropdown>
 		</BsiTableColumn>
 
 		<BsiTableColumn
 			prop="id"
 			label="ID"
 			sortable="custom"
+			width="50"
+			align="center"
 		/>
 
 		<BsiTableColumn
 			prop="title"
 			label="Название"
 			sortable="custom"
-		/>
-
-		<BsiTableColumn
-			prop="group"
-			label="Группа"
-			sortable="custom"
+			width="300"
 			v-slot="{ row }"
 		>
-			{{ row.group.title }}
+			<el-link
+				type="primary"
+				:underline="false"
+				@click="goTo(row.id)"
+			>
+				{{ row.title }}
+			</el-link>
 		</BsiTableColumn>
 
 		<BsiTableColumn
-			prop="direction"
-			label="Направление"
+			prop="partition"
+			label="Раздел"
 			sortable="custom"
+			width="150"
 			v-slot="{ row }"
 		>
-			{{ row.direction.title }}
+			{{ row.partition ? row.partition.title : '' }}
+		</BsiTableColumn>
+
+		<BsiTableColumn
+			prop="is_active"
+			label="Активность"
+			sortable="custom"
+			width="140"
+			v-slot="{ row }"
+		>
+			{{ row.is_active ? 'Да' : 'Нет' }}
 		</BsiTableColumn>
 
 		<BsiTableColumn
 			prop="creator"
 			label="Создатель"
 			sortable="custom"
+			width="300"
 			v-slot="{ row }"
 		>
 			<UserLink
@@ -77,6 +96,7 @@
 			prop="created_at"
 			label="Дата создания"
 			sortable="custom"
+			width="220"
 			v-slot="{ row }"
 		>
 			{{ formatDateTime(row.created_at) }}
@@ -86,6 +106,7 @@
 			prop="last_editor"
 			label="Последний редактор"
 			sortable="custom"
+			width="300"
 			v-slot="{ row }"
 		>
 			<UserLink
@@ -99,6 +120,7 @@
 			prop="updated_at"
 			label="Дата последнего изменения"
 			sortable="custom"
+			width="220"
 			v-slot="{ row }"
 		>
 			{{ formatDateTime(row.updated_at) }}
@@ -114,11 +136,44 @@ import { useUser } from '@common/app/composables';
 import { UserLink } from '@common/shared/ui'
 import { formatDateTime } from '@/common/shared/utils';
 import { useActiveTab } from "@document-routes/document-route/entities/document-route";
+import { useRouter } from 'vue-router';
 
-const { setDefaultTab} = useActiveTab();  
+const { setDefaultTab } = useActiveTab();
 setDefaultTab();
 
 const { user } = useUser();
+const router = useRouter();
+
+const filter = [
+	{
+		column: 'id',
+		type: 'number',
+		title: 'ID',
+		value: null,
+		operator: null,
+	},
+	{
+		column: 'title',
+		type: 'string',
+		title: 'Название',
+		value: null,
+		operator: null,
+	},
+	{
+		column: 'created_at',
+		type: 'date',
+		title: 'Дата создания',
+		value: null,
+		operator: null,
+	},
+	{
+		column: 'updated_at',
+		type: 'date',
+		title: 'Дата последнего изменения',
+		value: null,
+		operator: null,
+	}
+];
 
 const handleChangeSettings = async ({ paginate, filter, sort, search }) => {
 
@@ -132,4 +187,15 @@ const handleChangeSettings = async ({ paginate, filter, sort, search }) => {
 
 };
 
+const goTo = (id) => {
+	router.push({ name: 'detailDocumentRoutePage', params: { id: id } });
+};
+
+const handleDropdownCommand = async (command, id) => {
+	switch (command) {
+		case 'edit':
+			router.push({ name: 'editDocumentRoutePage', params: { id: id } });
+			break;
+	}
+};
 </script>

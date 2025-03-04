@@ -12,14 +12,7 @@
 				<el-col :md="12">
 					<MainFields
 						v-model:form-data="formData"
-						:defaultValues="defaultValues"
-					/>
-
-				</el-col>
-				<el-col :md="12">
-					<Files
-						v-model:form-data="formData"
-						:defaultValues="defaultValues"
+						:mode="mode"
 					/>
 				</el-col>
 			</el-row>
@@ -36,17 +29,21 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from "vue";
-import { useRouter } from 'vue-router';
+import { reactive, ref, watch, onUnmounted } from "vue";
+import { useRouter, useRoute } from 'vue-router';
 import { Preloader } from "@common/shared/ui";
 import MainFields from "./MainFields.vue";
-import Files from "./Files.vue";
 import { prepareFiles, formatDateTime, notify, getFormDataFileList } from '@common/shared/utils';
 import { DirectiveRepo } from "@documents/directive/entities/directive/api/index.js";
 import { createDocumentLink } from '@documents/common/entities/document';
 import { useUser } from "@/common/app/composables";
+import { DOCUMENT_STATUS } from "@documents/directive/entities/directive/constants";
+import { useDocument } from "@/documents/directive/entities/directive";
+
+const { document } = useDocument();
 
 const loading = ref(false);
+
 const props = defineProps({
 	mode: String,
 	data: {
@@ -57,12 +54,12 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const route = useRoute();
 const { user } = useUser();
 
 const form = ref();
 
 const rules = reactive({
-	theme: { required: true, message: 'Необходимо ввести тему документа' },
 	content: { required: true, message: 'Необходимо ввести содержание документа' },
 	executed_at: { required: true, message: 'Необходимо указать срок исполнения' },
 	creator: { required: true, message: 'Необходимо указать создателя' },
@@ -70,11 +67,20 @@ const rules = reactive({
 	executors: { required: true, message: 'Необходимо указать исполнителей' },
 	main: { required: false, message: 'Необходимо прикрепить основные файлы' },
 	portfolio: { required: false, message: 'Необходимо ввести описание портфеля документов' },
+	theme: {
+		validator: (rule, value, callback) => {
+			if (!value.theme_title && !value.tmp_doc_id) {
+				return callback(new Error('Необходимо указать тему'));
+			}
+
+			callback();
+		},
+	},
 });
 
 const formData = reactive({
 	id: null,
-	theme: null,
+	status_id: DOCUMENT_STATUS.PREPARATION,
 	content: null,
 	portfolio: null,
 	executed_at: null,
@@ -85,62 +91,73 @@ const formData = reactive({
 	observers: [],
 	main: [],
 
+	theme: {
+		theme_title: '',
+		tmp_doc_id: null,
+	}
+
 });
 
-const defaultValues = reactive({
-	themes: [],
-});
-
-//TODO: сдлеать общее получение тем с бэка
-defaultValues.themes = [
-	{ id: 1, title: 'Тестовая тема' },
-	{ id: 2, title: 'Тестовая тема 2' },
-	{ id: 3, title: 'Тестовая тема 3' },
-];
+const broadcastChannel = new BroadcastChannel('creation-based');
 
 const submit = async () => {
 
 	form.value.validate(async (isValid) => {
 		if (!isValid) return;
 
-		let document, dto, files, link;
+		let _document, dto, files, link;
 
 		try {
 			loading.value = true;
+
 			dto = {
 				document_id: formData.id,
-				theme_id: formData.theme.id,
 				executed_at: formData.executed_at,
 				content: formData.content,
 				portfolio: formData.portfolio,
 
 				creator_id: formData.creator.id,
-				author_id: formData.author.id,
-				executors: formData.executors.map(el => el.id),
-				controllers: formData.controllers.map(el => el.id),
-				observers: formData.observers.map(el => el.id),
+				author: formData.author,
+				executors: formData.executors,
+				controllers: formData.controllers,
+				observers: formData.observers,
+				theme_title: formData.theme.theme_title,
+				tmp_doc_id: formData.theme.tmp_doc_id,
 			};
 
 			if (props.mode === 'create') {
-				document = await DirectiveRepo.create(dto);
+
+				dto.parent_document_id = +route.params.parent_id || null;
+
+				_document = await DirectiveRepo.preCreate(dto);
 				if (formData.main.length > 0) {
-					files = getFormDataFileList(document.id)
+					files = getFormDataFileList(_document.id)
 						.append(formData.main, 'main')
 						.get();
 					await DirectiveRepo.uploadFiles(files);
 				}
 
+				broadcastChannel.postMessage('Документ создан');
+
 			} else {
-				document = await DirectiveRepo.update(dto);
-				files = getFormDataFileList(document.id)
+				_document = await DirectiveRepo.update(dto);
+				files = getFormDataFileList(_document.id)
 					.append(formData.main, 'main')
 					.get();
 
 				await DirectiveRepo.uploadFiles(files);
 			}
 
-			link = createDocumentLink(document.type_id, 'detail', document.id);
-			router.push(link);
+			/**
+			  * Обновляем документ и переходим в деталку после редактирования.
+			  * Если маршрут указывал на деталку (только при редактировании черновика), то router.push не сработает,
+			  * а компонент страницы редактирования поменяется на деталку по условию.
+			  */
+
+			document.value = _document;
+
+			link = createDocumentLink(_document.type_id, 'detail', _document.id);
+			router.push(link);			
 
 		} catch (e) {
 			notify.fetchError(e.message);
@@ -157,7 +174,6 @@ if (props.mode === 'edit') {
 
 	const {
 		id,
-		theme,
 		contents,
 		executed_at,
 		creator,
@@ -167,11 +183,10 @@ if (props.mode === 'edit') {
 		observers,
 
 		main_files,
+		theme,
 	} = props.data;
 
 	formData.id = id;
-
-	formData.theme = theme;
 
 	formData.content = contents.content;
 	formData.portfolio = contents.portfolio;
@@ -183,17 +198,33 @@ if (props.mode === 'edit') {
 	});
 
 	formData.creator = creator.user;
-	formData.author = author.user;
-	formData.executors = executors.map(el => el.user);
-	formData.controllers = controllers.map(el => el.user);
-	formData.observers = observers.map(el => el.user);
+	formData.author = author;
+	formData.executors = executors;
+	formData.controllers = controllers;
+	formData.observers = observers;
 
 	formData.main = prepareFiles(main_files ? main_files.map(el => el.file) : []);
 
-} else formData.creator = user;
+	formData.theme.theme_title = theme;
+	formData.theme.tmp_doc_id = null;
 
+} else {
+	formData.creator = user;
+}
 
 watch([() => formData.main.length], () => {
 	form.value.validateField(['main'], () => null);
 })
+
+watch([() => formData.author], () => {
+	form.value && form.value.validateField(['author'], () => null);
+}, { deep: true });
+
+watch([() => formData.executors], () => {
+	form.value && form.value.validateField(['executors'], () => null);
+}, { deep: true });
+
+onUnmounted(() => {
+	broadcastChannel.close();
+});
 </script>

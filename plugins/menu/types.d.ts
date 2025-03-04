@@ -15,6 +15,7 @@ export interface Menu {
 	count?: number;
 	rights: string[];
 	replaceMenu?: Menu;
+	icon: ?string;
 }
 
 export interface useActionButtonsReturn {

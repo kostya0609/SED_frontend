@@ -16,6 +16,7 @@
 					:type="field.type"
 					v-model="model[field.column].operator"
 					v-model:value="model[field.column].value"
+					:disabled="field.disabled"
 					class="filter-item__operator"
 				/>
 				<ValueField
@@ -24,8 +25,12 @@
 					v-model="model[field.column].value"
 					class="filter-item__value"
 					:operator="model[field.column].operator"
+					:options="model[field.column].options"
 				/>
-				<div class="filter-item__delete">
+				<div
+					class="filter-item__delete"
+					v-if="false"
+				>
 					<el-button
 						icon="Close"
 						@click="deleteField(field.column)"
@@ -74,8 +79,8 @@ const formRef = ref();
 const items = ref(props.filter);
 
 const entries = items.value.map(
-	({ column, value, operator }) =>
-		[column, { value, operator }]
+	({ column, value, operator, options }) =>
+		[column, { value, operator, options }]
 );
 
 
@@ -93,17 +98,16 @@ const deleteField = column => {
 };
 
 const reset = () => {
-	model.value = Object.fromEntries(
-		items.value.map(({ column }) => [column, { value: null, operator: null }])
-	);
-
+	model.value = Object.fromEntries(items.value.map( // перезагружаем из конфига, с правильным value
+		({ column, value, operator, options }) =>
+			[column, { value, operator, options }]
+	));
 	emit('reset', model.value);
 };
 
 const submit = async () =>
 	await formRef.value.validate(isValid => {
 		if (!isValid) return;
-
 		emit('filter', model.value);
 	});
 

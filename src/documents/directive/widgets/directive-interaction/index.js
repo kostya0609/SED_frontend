@@ -1,0 +1,1 @@
+export { default as DirectiveInteraction } from './DirectiveInteraction.vue';

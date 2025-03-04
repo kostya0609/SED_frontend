@@ -4,19 +4,25 @@
 		@click="handleClick"
 	>
 		<slot>
-			Отправить на согласование
+			<template v-if="checkDocumentStatus([DOCUMENT_STATUS.PREPARATION, DOCUMENT_STATUS.FIX])">
+				Отправить на согласование
+			</template>
+			<template v-else-if="checkDocumentStatus(DOCUMENT_STATUS.FIX_SIGNING)">
+				Отправить на подписание
+			</template>
+			<template v-else-if="checkDocumentStatus(DOCUMENT_STATUS.FIX_RESOLUTION)">
+				Отправить на резолюцию
+			</template>
+			<template v-else>
+				Отправить на согласование
+			</template>
 		</slot>
 	</el-button>
 </template>
 <script setup>
-import { ESZRepo } from "@documents/esz/entities/esz/api";
-import { DOCUMENT_STATUS } from "@documents/esz/entities/esz/constants";
+import { useProcess } from "@/plugins/process";
 import { useActiveTab, useDocument } from "@documents/esz/entities/esz";
-import { inject } from "vue";
-
-const processRef = inject('processRef');
-
-const { checkDocumentStatus } = useDocument();
+import { DOCUMENT_STATUS } from "@documents/esz/entities/esz/constants";
 
 const props = defineProps({
 	type: {
@@ -28,18 +34,17 @@ const props = defineProps({
 	},
 });
 
+const { checkDocumentStatus, sendToApproval } = useDocument();
+const { reloadProcess } = useProcess();
 const { setActiveTab } = useActiveTab();
 
 const handleClick = async () => {
 	if (checkDocumentStatus([DOCUMENT_STATUS.PREPARATION, DOCUMENT_STATUS.FIX])) {
 		setActiveTab('process');
 	} else {
-		await ESZRepo.sendToApproval(props.documentId);
-
-		// TODO: Исправить косяк с обновлением процесса
-		// processRef.value.updateProcess();
-
-		location.reload();
+		await sendToApproval(props.documentId);
+		await reloadProcess();
+		setActiveTab('process');
 	}
 };
 </script>

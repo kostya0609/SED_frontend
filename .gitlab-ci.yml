@@ -1,0 +1,44 @@
+variables:
+  GIT_STRATEGY: clone
+  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_SUBMODULE_FORCE_HTTPS: "true"
+
+stages:
+  - build
+  - deploy
+  - deploy-test
+
+# Этап для сборки проекта
+build-job:
+  stage: build
+  when: manual
+  script:
+    - npm ci --prefer-offline --audit false --loglevel=error
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+
+# Этап для деплоя проекта
+deploy-job:
+  stage: deploy
+  when: manual
+  dependencies:
+    - build-job
+  script:
+    - rm -rf /sed-dist/*
+    - cp -r dist/* /sed-dist
+  only:
+    - main
+
+# Этап для теста
+deploy-test-job:
+  stage: deploy-test
+  when: manual
+  dependencies:
+    - build-job
+  script:
+    - rm -rf /sed-test/*
+    - cp -r dist/* /sed-test
+  only:
+    - main

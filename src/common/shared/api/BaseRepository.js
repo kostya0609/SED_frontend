@@ -1,7 +1,8 @@
+import { ApiError } from "../errors/ApiError";
+
 export class BaseRepository {
 	/** @var {string} _url адрес api */
-	_url = process.env.NODE_ENV == 'production' ? `${!window._SED_TEST ? (window.location.origin + '/api') : 'https://api2.bsi.local/api-test'}` : import.meta.env.VITE_HOST;
-
+	_url = process.env.NODE_ENV == 'production' ? `${window.location.origin + (window._SED_TEST ? '/api-test' : '/api')}` : import.meta.env.VITE_HOST;
 
 	/** @var {string} _version версия api на бэке */
 	_version = 'v1';
@@ -74,6 +75,16 @@ export class BaseRepository {
 	*/
 	_buildSubmoduleUrl(nestedEndpoint) {
 		return new URL(`${this._url}/${this._module}/${this._submodule}/${this._version}${this._endpoint ? '/' + this._endpoint : ''}` + (nestedEndpoint ? `/${nestedEndpoint}` : ''));
+	}
+
+	_handleError(result) {
+		if (!result.success) {
+			throw new ApiError(
+				result.errors ? Object.values(result.errors).join('\n') : result.message,
+				result.exception,
+				result.errors || []
+			);
+		}
 	}
 
 	/**

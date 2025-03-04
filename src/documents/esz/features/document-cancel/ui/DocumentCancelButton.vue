@@ -10,10 +10,8 @@
 </template>
 <script setup>
 import { ElMessageBox } from 'element-plus';
+import { useProcess } from "@/plugins/process";
 import { useDocument } from "@documents/esz/entities/esz";
-import { inject } from 'vue';
-
-const processRef = inject('processRef');
 
 const props = defineProps({
 	document_id: {
@@ -21,6 +19,8 @@ const props = defineProps({
 		requared: true,
 	}
 });
+
+const { reloadProcess } = useProcess();
 
 const { cancel } = useDocument();
 
@@ -33,7 +33,7 @@ const handleClick = async () => {
 			}
 
 			await cancel(props.document_id);
-			await processRef.value.updateProcess();
+			await reloadProcess();			
 		},
 	});
 };

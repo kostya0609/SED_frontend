@@ -17,7 +17,10 @@
 
 				<el-space class="mt-3">
 					<ChangeDataButton />
-					<RouteDeleteButton :id="documentRoute.id" />
+					<RouteDeleteButton
+						:id="documentRoute.id"
+						v-if="!documentRoute.check_route_usage"
+					/>
 					<RouteDeactivateButton
 						:id="documentRoute.id"
 						:disabled="!documentRoute.is_active"
@@ -48,7 +51,7 @@ import { ChangeDataButton } from '@document-routes/document-route/features/chang
 import { RouteDeleteButton } from '@document-routes/document-route/features/route-delete';
 import { RouteDeactivateButton } from '@document-routes/document-route/features/route-deactivate';
 
-const {activeTab} = useActiveTab();  
+const { activeTab } = useActiveTab();
 
 const route = useRoute();
 const { documentRoute, loading, initDocumentRoute, updateDocumentRoute } = useDocumentRoute();

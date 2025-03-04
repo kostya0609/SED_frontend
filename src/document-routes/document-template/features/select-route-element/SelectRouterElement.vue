@@ -29,7 +29,7 @@ try {
 }
 
 const handleChangeDocumentTemplateType = (documenTemplateTypeId) => {
-	router.push(createDocumentTemplateLink(documenTemplateTypeId, 'create', null, route.params.routeId));
+	router.replace(createDocumentTemplateLink(documenTemplateTypeId, 'create', null, route.params.routeId));
 };
 
 </script>

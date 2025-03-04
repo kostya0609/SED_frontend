@@ -78,6 +78,19 @@ export const useDocument = () => {
 		}
 	};
 
+	const sendToApproval = async (document_id) => {
+		try {
+			loading.value = true;
+			const directive = await DirectiveRepo.sendToApproval({ document_id });
+			document.value = directive;
+		} catch (e) {
+			notify.fetchError(e.message);
+			throw e;
+		} finally {
+			loading.value = false;
+		}
+	};
+
 	/**
 	 * @returns {string[]} Возвращает массив прав доступа
 	 */
@@ -123,6 +136,8 @@ export const useDocument = () => {
 		}
 	}
 
+
+
 	return {
 		document,
 		loading,
@@ -130,6 +145,7 @@ export const useDocument = () => {
 		updateDocument,
 		cancel,
 		remove,
+		sendToApproval,
 		checkDocumentRights,
 		getRights,
 		checkDocumentStatus,

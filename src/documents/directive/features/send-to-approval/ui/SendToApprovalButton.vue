@@ -10,6 +10,8 @@
 </template>
 <script setup>
 import { useActiveTab } from "@documents/directive/entities/directive";
+import { useDocument } from "@documents/directive/entities/directive";
+import { useProcess } from "@/plugins/process";
 
 defineProps({
 	type: {
@@ -19,8 +21,12 @@ defineProps({
 });
 
 const { setActiveTab } = useActiveTab();
+const { sendToApproval, document } = useDocument();
+const { reloadProcess } = useProcess();
 
-const handleClick = () => {
+const handleClick = async () => {
+	await sendToApproval(document.value.id);
+	await reloadProcess();
 	setActiveTab('process');
 };
 </script>

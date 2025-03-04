@@ -5,3 +5,4 @@ export { prepareFiles } from './prepareFiles.js';
 export { formatDateTime } from './formatDateTime.js';
 export { getFormDataFile } from './getFormDataFile.js';
 export { getFormDataFileList } from './getFormDataFileList.js';
+export { formatDate } from './formatDate.js';

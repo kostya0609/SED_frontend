@@ -2,25 +2,12 @@
 	<h3 class="header_h3">Основные файлы</h3>
 	<el-form-item
 		class="form__item"
-		props="main"
+		prop="main"
 	>
 		<UploadFile
 			v-model:file-list="formData.main"
 			multiple
-		/>
-	</el-form-item>
-
-	<h3 class="header_h3">Описание портфеля документов</h3>
-	<el-form-item
-		class="form__item"
-		props="portfolio"
-	>
-		<el-input
-			v-model="formData.portfolio"
-			type="textarea"
-			:rows="6"
-			placeholder="Описание портфеля документов"
-			class="form__input"
+			style-v2
 		/>
 	</el-form-item>
 </template>

@@ -2,79 +2,89 @@
 	<el-popover
 		placement="bottom-start"
 		:visible="visible"
-		popper-class="popover-filter"
+		popper-class="filter-button__popover-filter"
 	>
 		<template #reference>
-			<el-input
-				v-model="query"
-				placeholder="Поиск"
-				prefix-icon="Search"
-				@input="handleSearch"
-				v-if="searchable"
+			<el-badge
+				is-dot
+				type="primary"
+				:hidden="!filledFilter"
 			>
-				<template #prepend>
-					<el-button
-						@click="changeVisible"
-						v-bind="$attrs"
-						class="filter-button"
-					>
-						Фильтр
-					</el-button>
-				</template>
-			</el-input>
-
-			<el-button
-				@click="changeVisible"
-				v-bind="$attrs"
-				class="filter-button"
-				v-else
-			>
-				Фильтр
-			</el-button>
+				<el-button
+					@click.stop="changeVisible"
+					v-bind="$attrs"
+					class="filter-button"
+				>
+					Фильтр
+				</el-button>
+			</el-badge>
 
 		</template>
 		<Filter
 			:filter="filter"
-			:state="state"
+			@change="handleChangeFilter"
+			@change-fields="handleChangeFilterFields"
 		/>
 	</el-popover>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import Filter from './Filter.vue';
-import { useEventEmitter } from '../../shared/events';
-
-const { emitter } = useEventEmitter();
 
 const props = defineProps({
 	filter: {
 		type: Object,
 		required: true,
 	},
-	state: {
-		type: Object,
-		required: false,
-		default: null,
-	},
-	searchable: {
-		type: Boolean,
-		default: false,
-	},
 });
 
-const visible = ref(false);
+const emit = defineEmits(['change']);
 
-const query = ref('');
+const visible = ref(false);
+const filledFilter = ref(false);
+
 
 const changeVisible = () => {
 	visible.value = !visible.value;
 };
 
-const handleSearch = async (value) => {
-	if (props.searchable) {
-		emitter.emit('search', value);
+const handleClickOutside = (event) => {
+	const popoverEl = document.querySelector('.filter-button__popover-filter'); // Select the popover
+	const datePickerPanel = document.querySelector('.el-picker-panel'); // Панель DatePicker
+	if (popoverEl && !popoverEl.contains(event.target) &&
+		(!datePickerPanel || !datePickerPanel.contains(event.target))) {
+		visible.value = false;
 	}
 };
+
+const handleChangeFilterFields = (fields) => {
+	filledFilter.value = false;
+
+	Object.entries(fields)
+		.forEach(([fieldName, filter]) => {
+			if (Array.isArray(filter.value)) {
+				if (filter.value.length > 0) {
+					filledFilter.value = true;
+				}
+			} else if (filter.value) {
+				filledFilter.value = true;
+			}
+		});
+};
+
+const handleChangeFilter = () => {
+	emit('change');
+	visible.value = false;
+};
+
+onMounted(() => {
+	document.addEventListener('click', handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+	document.removeEventListener('click', handleClickOutside);
+});
+
 </script>
 <style lang="scss" scoped>
 .filter-button {
@@ -83,7 +93,7 @@ const handleSearch = async (value) => {
 	margin: 0;
 }
 
-:global(.popover-filter) {
+:global(.filter-button__popover-filter) {
 	width: 100% !important;
 	max-width: 700px;
 }

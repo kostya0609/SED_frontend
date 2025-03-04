@@ -1,0 +1,1 @@
+export { default as SearchDepartmentField } from './SearchDepartmentField.vue';

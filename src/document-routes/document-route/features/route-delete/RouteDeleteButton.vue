@@ -32,7 +32,7 @@ const handleClick = () => {
 			}
 
 			await remove(props.id);
-			router.replace('/sed/admin/document-routes/list');
+			router.replace('/sed/admin/document-routes/list-v2');
 		},
 	});
 };

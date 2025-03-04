@@ -1,33 +1,20 @@
-import Preloader from './Preloader.vue';
-import SearchUser from './SearchUser.vue'
-import UploadFile from './UploadFile.vue'
-import Pagination from './Pagination.vue';
-import Switch from './Switch.vue';
-import UserLink from './UserLink.vue';
-import SearchTheme from './SearchTheme.vue'
-import DocumentHistory from './DocumentHistory.vue';
-import ProcessHistory from './ProcessHistory.vue';
-import SearchStaticRole from './SearchStaticRole.vue';
-import SearchUserExtra from './SearchUserExtra.vue';
-import FileLink from './FileLink.vue';
-import ParticipantList from './ParticipantList.vue';
-import AttachmentList from './AttachmentList.vue';
-import ParticipantListDocTmp from './ParticipantListDocTmp.vue'
-
-export {
-	Preloader,
-	SearchUser,
-	UploadFile,
-	Pagination,
-	Switch,
-	UserLink,
-	SearchTheme,
-	DocumentHistory,
-	ProcessHistory,
-	SearchStaticRole,
-	SearchUserExtra,
-	FileLink,
-	ParticipantList,
-	AttachmentList,
-	ParticipantListDocTmp
-};
+export { default as Preloader } from './Preloader.vue';
+export { default as SearchUser } from './SearchUser.vue';
+export { default as UploadFile } from './UploadFile.vue';
+export { default as Pagination } from './Pagination.vue';
+export { default as Switch } from './Switch.vue';
+export { default as UserLink } from './UserLink.vue';
+export { default as SearchTheme } from './SearchTheme.vue';
+export { default as DocumentHistory } from './DocumentHistory.vue';
+export { default as ProcessHistory } from './ProcessHistory.vue';
+export { default as SearchStaticRole } from './SearchStaticRole.vue';
+export { default as SearchDynamicRole } from './SearchDynamicRole.vue';
+export { default as SearchUserExtra } from './SearchUserExtra.vue';
+export { default as FileLink } from './FileLink.vue';
+export { default as ParticipantList } from './ParticipantList.vue';
+export { default as AttachmentList } from './AttachmentList.vue';
+export { default as ParticipantListDocTmp } from './ParticipantListDocTmp.vue';
+export { default as Instruction } from './Instruction.vue';
+export { default as UserSearchV2 } from './UserSearchV2.vue';
+export { default as Participant } from './Participant.vue';
+export { default as Link } from './Link.vue';

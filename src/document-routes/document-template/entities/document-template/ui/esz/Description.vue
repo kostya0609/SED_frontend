@@ -4,7 +4,7 @@
 		:column="1"
 		class="document-template-description"
 	>
-		<el-descriptions-item label="Элемент">
+		<el-descriptions-item label="Тип документа">
 			{{ documentTemplate.type.title }}
 		</el-descriptions-item>
 
@@ -12,8 +12,24 @@
 			{{ documentTemplate.title }}
 		</el-descriptions-item>
 
-		<el-descriptions-item label="Родительский шаблон документа">
-			{{ documentTemplate.parent ? documentTemplate.parent.title : 'отсутствует' }}
+		<el-descriptions-item label="Маршрут шаблона">
+			<el-link
+				:href="`/sed/admin/document-routes/detail/${documentTemplate.route.id}`"
+				:underline="false"
+				type="primary"
+			>
+				{{ documentTemplate.route.title }}
+			</el-link>
+		</el-descriptions-item>
+
+		<el-descriptions-item label="Родительские шаблоны">
+			<el-text
+				type="info"
+				v-if="!documentTemplate.parents.length"
+			>
+				Отсутствуют
+			</el-text>
+			<TemplateList :templates="documentTemplate.parents" />
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Содержание документа">
@@ -45,11 +61,29 @@
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Подписант">
-			<UserLink :user="documentTemplate.data.signatory" />
+			<Participant
+				:participant="documentTemplate.data.signatory"
+				v-if="documentTemplate.data.signatory"
+			/>
+			<el-text
+				type="info"
+				v-else
+			>
+				Отсутствует
+			</el-text>
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Адресат">
-			<ParticipantListDocTmp :participants="documentTemplate.data.receivers" />
+			<ParticipantListDocTmp
+				:participants="documentTemplate.data.receivers"
+				v-if="documentTemplate.data.receivers.length > 0"
+			/>
+			<el-text
+				type="info"
+				v-else
+			>
+				Отсутствует
+			</el-text>
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Наблюдатели">
@@ -69,8 +103,9 @@
 </template>
 
 <script setup>
-import { UserLink, ParticipantListDocTmp } from '@common/shared/ui';
+import { UserLink, ParticipantListDocTmp, Participant } from '@common/shared/ui';
 import { formatDateTime } from '@common/shared/utils';
+import TemplateList from '../TemplateList.vue';
 
 const props = defineProps({
 	documentTemplate: {

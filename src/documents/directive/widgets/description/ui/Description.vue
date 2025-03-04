@@ -16,7 +16,10 @@
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Тема">
-			{{ document.theme }}
+			<ThemeWithAdminLinks
+				:template-document="document.template_document"
+				:theme-title="document.theme"
+			/>
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Дата создания">
@@ -24,12 +27,24 @@
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Срок исполнения">
-			{{ formatDateTime(document.executed_at) }}
+			{{ formatDateTime(document.executed_at, {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric',
+			}) }}
 		</el-descriptions-item>
 
-		<el-descriptions-item label="Документ основания">
-			<template v-if="document.parent">
-				{{ document.parent.number }}
+		<el-descriptions-item label="Документ основание">
+			<template v-if="document.parent_document">
+				<el-link
+					:underline="false"
+					:href="createDocumentLink(document.parent_document.type_id, 'detail', document.parent_document.document_id)"
+					target="_blank"
+					type="primary"
+					@click="() => setDocumentId(document.parent_document.id)"
+				>
+					{{ document.parent_document.number }}
+				</el-link>
 			</template>
 			<el-text
 				type="info"
@@ -43,6 +58,18 @@
 			{{ document.contents.content }}
 		</el-descriptions-item>
 
+		<el-descriptions-item label="Основные файлы">
+			<AttachmentList
+				v-if="document.main_files.length > 0"
+				:attachments="document.main_files"
+			/>
+			<el-text
+				type="info"
+				v-else
+			>
+				Отсутствуют
+			</el-text>
+		</el-descriptions-item>
 		<el-descriptions-item label="Описание портфеля документов">
 			<template v-if="document.contents && document.contents.portfolio">
 				{{ document.contents.portfolio }}
@@ -60,11 +87,29 @@
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Автор">
-			<UserLink :user="document.author.user" />
+			<UserLink
+				:user="document.author.user"
+				v-if="document.author"
+			/>
+			<el-text
+				type="danger"
+				v-else
+			>
+				ОТСУТСТВУЕТ (НЕОБХОДИМО УКАЗАТЬ)
+			</el-text>
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Исполнители">
-			<ParticipantList :participants="document.executors" />
+			<ParticipantList
+				:participants="document.executors"
+				v-if="document.executors.length"
+			/>
+			<el-text
+				type="danger"
+				v-else
+			>
+				ОТСУТСТВУЮТ (НЕОБХОДИМО УКАЗАТЬ)
+			</el-text>
 		</el-descriptions-item>
 
 		<el-descriptions-item label="Контроллер">
@@ -93,24 +138,15 @@
 			</el-text>
 		</el-descriptions-item>
 
-		<el-descriptions-item label="Основные файлы">
-			<AttachmentList
-				v-if="document.main_files.length > 0"
-				:attachments="document.main_files"
-			/>
-			<el-text
-				type="info"
-				v-else
-			>
-				Отсутствуют
-			</el-text>
-		</el-descriptions-item>
 	</el-descriptions>
 </template>
 
 <script setup>
 import { UserLink, ParticipantList, AttachmentList } from '@/common/shared/ui';
 import { formatDateTime } from '@/common/shared/utils';
+import { createDocumentLink } from '@documents/common/entities/document/';
+import { ThemeWithAdminLinks } from '@/documents/common/features/theme-with-admin-links';
+import { setDocumentId } from '@documents/common/features/selected-document-ids';
 
 defineProps({
 	document: Object,

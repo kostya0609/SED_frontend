@@ -5,29 +5,33 @@
 		@runned="onRunned"
 		@decided="onDecided"
 		@completed="onCompleted"
-		@executorCancelled="onExecutorCancelled"
-		@participantCancelled="onParticipantCancelled"
-		v-slot:head="{ process }"
+		@executor-cancelled="onExecutorCancelled"
+		@participant-cancelled="onParticipantCancelled"
+		@decided-with-interaction="onDecidedWithInteraction"
+		:approval-routes="approvalRoutes"
+		v-slot:head
+		v-if="!checkDocumentStatus(DOCUMENT_STATUS.EXECUTION_CHANGE_REQUEST)"
 	>
-		{{ process.title }}
+		Принятие решения по документу "{{ document.number }}"
 	</Process>
+	<el-result
+		icon="warning"
+		title="Бизнес-процесс недоступен на этом статусе документа!"
+		sub-title="Пожалуйста, дождитесь, когда автор примет решение."
+		v-else
+	/>
 </template>
 
 <script setup>
-import { ref, inject } from 'vue';
-import { TEMPLATE_ACTION } from "@/plugins/process/constants";
 import { useActiveTab, useDocument } from "@documents/directive/entities/directive";
+import { DOCUMENT_STATUS } from "@/documents/directive/entities/directive/constants";
 
 defineProps({
-	document: Object,
+	approvalRoutes: Array,
 });
 
 const { setActiveTab } = useActiveTab();
-const { updateDocument } = useDocument();
-
-const interactionRef = inject('interactionRef');
-const processRef = inject('processRef');
-
+const { updateDocument, document, checkDocumentStatus } = useDocument();
 
 /**
  * Обработка события: бизнес-процесс создан
@@ -53,24 +57,21 @@ const onRunned = async () => {
 /**
  * Обработка события: принято решение в бизнес-процессе
  */
-const onDecided = async (action) => {
+const onDecided = async () => {
 	await updateDocument();
+};
 
-	if (action.template_action_id === TEMPLATE_ACTION.MAKE_COMMENT_AND_NOTIFY_EXECUTOR ||
-		action.template_action_id === TEMPLATE_ACTION.MAKE_COMMENT_AND_NOTIFY_EXECUTOR_DOCUMENT) {
-
-		setActiveTab('interaction');
-		setTimeout(async () => {
-			await interactionRef.value.updateComments();
-		}, 100);
-	}
+/**
+ * Обработка события: принято решение в бизнес-процессе, в котором активно взаимодействие
+ */
+const onDecidedWithInteraction = async () => {
+	setActiveTab('interaction');
 };
 
 /**
  * Обработка события: бизнес-процесс выполнен
  */
 const onCompleted = async () => {
-	await updateDocument();
 };
 
 /**
@@ -87,5 +88,3 @@ const onParticipantCancelled = async () => {
 	await updateDocument();
 };
 </script>
-
-<style scoped></style>

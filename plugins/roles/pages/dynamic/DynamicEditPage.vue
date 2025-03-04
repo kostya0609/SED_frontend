@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRoute} from 'vue-router';
 import { Preloader } from '@/plugins/roles/shared/ui';
 import { ref, inject } from "vue";
 import { DynamicRoleForm } from '@/plugins/roles/widgets/dynamic-role-form';
@@ -25,6 +25,7 @@ import { USE_BACK_BUTTON_KEY } from '@/plugins/roles/shared/symbols';
 
 const DynamicRoleRepo = useDynamicRoleRepo();
 const route = useRoute();
+
 const loading = ref(false);
 const role = ref(null);
 const useBackButton = inject(USE_BACK_BUTTON_KEY);
@@ -45,4 +46,5 @@ const getRole = async (id) => {
 await getRole(route.params.id);
 
 useBackButton();
+
 </script>

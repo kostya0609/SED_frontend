@@ -34,14 +34,7 @@ export class DocumentTemplateRepository extends BaseRepository {
 			payload,
 			nestedEndpoint: 'create'
 		});
-		if (!result.success) {
-			if (result.errors) {
-				throw new Error(Object.values(result.errors).join('\n'));
-			}
-
-			throw new Error(result.message);
-		}
-
+		this._handleError(result);
 		return result.data;
 	}
 
@@ -65,17 +58,9 @@ export class DocumentTemplateRepository extends BaseRepository {
 			payload,
 			nestedEndpoint: 'edit'
 		});
-		if (!result.success) {
-			if (result.errors) {
-				throw new Error(Object.values(result.errors).join('\n'));
-			}
-
-			throw new Error(result.message);
-		}
-
+		this._handleError(result);
 		return result.data;
 	}
-
 
 	/**
 	 * @param {{user_id: number, id: number}} payload
@@ -86,14 +71,7 @@ export class DocumentTemplateRepository extends BaseRepository {
 			payload,
 			nestedEndpoint: 'get'
 		});
-		if (!result.success) {
-			if (result.errors) {
-				throw new Error(Object.values(result.errors).join('\n'));
-			}
-
-			throw new Error(result.message);
-		}
-
+		this._handleError(result);
 		return result.data;
 	}
 
@@ -106,14 +84,7 @@ export class DocumentTemplateRepository extends BaseRepository {
 			payload,
 			nestedEndpoint: 'list'
 		});
-		if (!result.success) {
-			if (result.errors) {
-				throw new Error(Object.values(result.errors).join('\n'));
-			}
-
-			throw new Error(result.message);
-		}
-
+		this._handleError(result);
 		return result.data;
 	}
 
@@ -126,14 +97,7 @@ export class DocumentTemplateRepository extends BaseRepository {
 			payload,
 			nestedEndpoint: 'delete'
 		});
-		if (!result.success) {
-			if (result.errors) {
-				throw new Error(Object.values(result.errors).join('\n'));
-			}
-
-			throw new Error(result.message);
-		}
-
+		this._handleError(result);
 		return result.data;
 	}
 
@@ -146,14 +110,46 @@ export class DocumentTemplateRepository extends BaseRepository {
 			payload,
 			nestedEndpoint: 'deactivate'
 		});
-		if (!result.success) {
-			if (result.errors) {
-				throw new Error(Object.values(result.errors).join('\n'));
-			}
+		this._handleError(result);
+		return result.data;
+	}
 
-			throw new Error(result.message);
-		}
+	/**
+	 * @param {{id: number, requirements: string}} payload
+	 * @return {Promise<any>}
+	 */
+	async updateRequirements(payload) {
+		const result = await this._query({
+			payload,
+			nestedEndpoint: 'update-requirements'
+		});
+		this._handleError(result);
+		return result.data;
+	}
 
+	/**
+	 * @param {number} role_id 
+	 * @returns {Promise<any[]>}
+	 */
+	async getDocumentsByStaticRole(role_id) {
+		const result = await this._query({
+			payload: { role_id },
+			nestedEndpoint: 'get-by-static-role'
+		});
+		this._handleError(result);
+		return result.data;
+	}
+
+	/**
+	 * @param {number} role_id 
+	 * @returns {Promise<any[]>}
+	 */
+	async getDocumentsByDynamicRole(role_id) {
+		const result = await this._query({
+			payload: { role_id },
+			nestedEndpoint: 'get-by-dynamic-role'
+		});
+		this._handleError(result);
 		return result.data;
 	}
 }

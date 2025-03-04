@@ -1,12 +1,20 @@
 <template>
-	<Preloader :loading="loading">
+	<EditReviewPage
+		hide-back-button
+		v-if="isDraft"
+	/>
+	<Preloader
+		:loading="loading"
+		v-else-if="document"
+	>
 		<ProcessProvider
 			:document="documentForProcess"
 			:template-id="document.process_template_id"
-			:executor-id="document.initiator.id"
+			:executor-id="document.initiator.user.id"
 			:user-id="getUserId()"
 			:access="processAccesses"
-			ref="processRef"
+			module-name="SEDReview"
+			:is-debug="checkUserRights('full_access')"
 		>
 
 			<h3 class="header_h3">
@@ -23,46 +31,54 @@
 					lazy
 				>
 					<Description :document="document" />
-					<el-space class="mt-3">
+					<div class="action-buttons mt-3">
 						<ChangeDataButton v-if="isEdit" />
-						<SendToApprovalButton v-if="isEdit" :document-id="document.id" />
+						<SendToApprovalButton
+							v-if="isEdit"
+							:document-id="document.id"
+						/>
 						<DocumentCancelButton
 							v-if="isCancel"
 							:document_id="document.id"
 						/>
-						<DocumentDeleteButton
-							v-if="isEdit"
-							:document_id="document.id"
+						<CreateBasedButton
+							:document="document"
+							@created="documentsCreated"
+							class="action-buttons--end"
 						/>
-					</el-space>
+					</div>
+
 				</el-tab-pane>
 				<el-tab-pane
-					label="Дополнительная информация"
+					label="Требования маршрута"
 					name="additionalInfo"
 					lazy
 				>
-					<AdditionalInfo />
+					<AdditionalInfo :document="document" />
 				</el-tab-pane>
 				<el-tab-pane
 					label="Бизнес процесс"
 					name="process"
 					lazy
 				>
-					<ApprovalReview :document="document" />
+					<ApprovalReview :approval-routes="approvalRoutes" />
 				</el-tab-pane>
 				<el-tab-pane
 					label=Чат
 					name="interaction"
 					lazy
 				>
-					<Interaction ref="interactionRef" />
+					<Interaction />
 				</el-tab-pane>
 				<el-tab-pane
 					label="Иерархия"
 					name="hierarchy"
 					lazy
 				>
-					<Hierarchy />
+					<Hierarchy
+						:hierarchyTree="document.hierarchy"
+						:document_id="document.common_document_id"
+					/>
 				</el-tab-pane>
 				<el-tab-pane
 					label="История решений"
@@ -86,40 +102,49 @@
 
 </template>
 <script setup>
-import { useRoute } from 'vue-router';
-import { useBackButton } from '@/plugins/menu';
+import { useRoute, useRouter } from 'vue-router';
+import { useActionButtons } from '@/plugins/menu';
 import { Preloader, DocumentHistory, ProcessHistory } from '@common/shared/ui';
 import { Description } from "@documents/review/widgets/description";
 import { ApprovalReview } from "@documents/review/widgets/approval-review";
 import { AdditionalInfo } from "@documents/review/widgets/additional-info";
-import { Hierarchy } from "@documents/review/widgets/hierarchy";
+import { Hierarchy } from "@documents/common/widgets/hierarchy";
 import { ChangeDataButton } from '@documents/review/features/change-data';
 import { SendToApprovalButton } from '@documents/review/features/send-to-approval';
 import { DocumentCancelButton } from '@documents/review/features/document-cancel';
-import { DocumentDeleteButton } from '@documents/review/features/document-delete';
 import { useActiveTab, useDocument } from "@documents/review/entities/review";
 import { useUser } from "@/common/app/composables";
 import { DOCUMENT_STATUS } from "@documents/review/entities/review/constants";
-import { ref, onUnmounted, computed, provide } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { CreateBasedButton } from '@documents/common/features/create-based-on';
+import { ApprovalRoutesRepo } from '@documents/common/shared/api';
+import { notify } from "@common/shared/utils";
+import EditReviewPage from './EditReviewPage.vue';
+import { useActiveList } from '@/documents/common/entities/document';
 
 const route = useRoute();
+const router = useRouter();
 const { getUserId, checkUserRights } = useUser();
 const { activeTab, setActiveTab } = useActiveTab();
-const { document, loading, initDocument, checkDocumentRights, checkDocumentStatus } = useDocument();
-const processRef = ref();
-const interactionRef = ref();
+const { document, loading, initDocument, updateDocument, checkDocumentRights, checkDocumentStatus } = useDocument();
+const { addButton, clearButtons } = useActionButtons();
 
 await initDocument(route.params.id);
 
+const { activeList } = useActiveList();
+
 const isEdit = computed(() => checkDocumentRights('document_full_access') && checkDocumentStatus(DOCUMENT_STATUS.PREPARATION));
 
-const isCancel = computed(() => checkDocumentRights('document_full_access') && checkDocumentStatus(DOCUMENT_STATUS.ARCHIVE_WORKED));
+const isCancel = computed(() => checkDocumentRights('document_full_access') && (checkDocumentStatus([DOCUMENT_STATUS.ARCHIVE_WORKED, DOCUMENT_STATUS.PREPARATION])));
+
+const isDraft = computed(() => checkDocumentStatus(DOCUMENT_STATUS.DRAFT));
 
 const processAccesses = {
 	full: checkUserRights('full_access'),
 	execute: checkDocumentStatus([
 		DOCUMENT_STATUS.PREPARATION,
 	]) ? false : checkDocumentRights('document_full_access'),
+	selectRoles: checkUserRights('full_access'),
 };
 
 const documentForProcess = {
@@ -128,12 +153,50 @@ const documentForProcess = {
 	link: location.href,
 };
 
-useBackButton({ fallbackPath: '/sed' });
+const approvalRoutes = ref([]);
+
+if (document.value.tmp_doc_id && !checkDocumentStatus(DOCUMENT_STATUS.DRAFT)) {
+	try {
+		loading.value = true;
+
+		approvalRoutes.value = await ApprovalRoutesRepo.list({
+			tmp_doc_id: document.value.tmp_doc_id,
+			process_template_id: document.value.process_template_id,
+		});
+
+	} catch (e) {
+		notify.fetchError(e.message);
+		throw e;
+	} finally {
+		loading.value = false;
+	}
+};
+
+const documentsCreated = async () => {
+	await updateDocument();
+	setActiveTab('hierarchy');
+};
+
+const broadcastChannel = new BroadcastChannel('creation-based');
+
+broadcastChannel.onmessage = async () => {
+	setActiveTab('hierarchy');
+	await initDocument(route.params.id);
+};
+
+onMounted(() => {
+	addButton({
+		title: 'ВЕРНУТЬСЯ НАЗАД',
+		onClick: () => {
+			router.push({ path: activeList.value || `/sed` });
+		}
+	});
+});
 
 onUnmounted(() => {
 	setActiveTab('description');
+	broadcastChannel.close();
+	clearButtons();
 })
 
-provide('processRef', processRef);
-provide('interactionRef', interactionRef);
 </script>

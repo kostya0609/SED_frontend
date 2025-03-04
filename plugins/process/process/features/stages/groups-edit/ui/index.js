@@ -1,0 +1,1 @@
+export { default as GroupsEdit } from './GroupsEdit.vue';

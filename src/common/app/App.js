@@ -10,7 +10,7 @@ import { registerModules, registerPlugins, registerComponents } from './provider
 dayjs.locale('ru');
 
 if (process.env.NODE_ENV == 'development') {
-	window._userId = import.meta.env.VITE_DEV_USER_ID || 14956;
+	window._userId = +import.meta.env.VITE_DEV_USER_ID || 14956;
 	window._token = '$2y$10$NMJZxfAaRIJpLeroZdnB5OQrFlm/o.2Hyx.mZWtADsWN9eyLanpOy';
 }
 

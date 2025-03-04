@@ -1,0 +1,1 @@
+export { default as SearchUserField } from './SearchUserField.vue';

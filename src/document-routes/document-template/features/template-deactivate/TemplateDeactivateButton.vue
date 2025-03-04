@@ -9,11 +9,9 @@
 	</el-button>
 </template>
 <script setup>
-import { useRouter } from 'vue-router';
 import { ElMessageBox } from 'element-plus';
 import { useDocumentTemplate } from "@document-routes/document-template/entities/document-template";
 
-const router = useRouter();
 const { deactivate } = useDocumentTemplate();
 
 const props = defineProps({

@@ -56,6 +56,7 @@ export const useGrids = () => {
               for (let key in filterData_new) {
                 if ((filterData_new[key].type === 'number' || filterData_new[key].type === 'date') && filterData_new[key].min) normalFilter[key] = filterData_new[key];
                 if ((filterData_new[key].type === 'list' || filterData_new[key].type === 'searchList') && filterData_new[key].value.length > 0) normalFilter[key] = filterData_new[key];
+                if (filterData_new[key].type === 'string') normalFilter[key] = filterData_new[key];
               }
                 
               gridsData[data.name].showValueFilter = showValueFilter_new;

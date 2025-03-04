@@ -1,4 +1,5 @@
 import ListRoutePage from '@document-routes/document-route/pages/ListRoutePage.vue';
+import ListRoutePageV2 from '@document-routes/document-route/pages/ListRoutePageV2.vue';
 import CreateRoutePage from '@document-routes/document-route/pages/CreateRoutePage.vue';
 import EditRoutePage from '@document-routes/document-route/pages/EditRoutePage.vue';
 import DetailRoutePage from '@document-routes/document-route/pages/DetailRoutePage.vue';
@@ -16,12 +17,17 @@ import TreePartitionPage from '@document-routes/partition/pages/TreePartitionPag
  */
 export const routes = [
 	{
-		path: '/admin/document-routes/list',
+		path: '/admin/document-routes/list/:route_id?',
 		component: ListRoutePage,
 		name: 'listDocumentRoutePage'
 	},
 	{
-		path: '/admin/document-routes/create',
+		path: '/admin/document-routes/list-v2/:partition_id?',
+		component: ListRoutePageV2,
+		name: 'listDocumentRoutePageV2'
+	},
+	{
+		path: '/admin/document-routes/create/:partition_id?',
 		component: CreateRoutePage,
 		name: 'createDocumentRoutePage'
 	},

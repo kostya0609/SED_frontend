@@ -3,5 +3,8 @@
  */
 export const getNormalizedRoutePath = (route) => {
 	const lastMatchedRoute = route.matched.at(-1);
-	return lastMatchedRoute ? lastMatchedRoute.path : route.path;
+	const result = lastMatchedRoute ? lastMatchedRoute.path : route.path;
+
+	/** Регулярка для обрезания параметров запроса, чтобы оставался только чистый путь до страницы */
+	return result.replace(/\/:.*/, '');
 };

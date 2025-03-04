@@ -1,6 +1,12 @@
 export class VariableStore {
 	#store = {};
 
+	constructor(initializedStorage = null) {
+		if (initializedStorage) {
+			this.#store = initializedStorage;
+		}
+	}
+
 	async get(moduleName, tableId, userId) {
 		const hasData = await this.has(moduleName, tableId, userId);
 
@@ -14,7 +20,7 @@ export class VariableStore {
 	async save({ moduleName, tableId, userId, data }) {
 		this.#store[moduleName] = this.#store[moduleName] || {};
 		this.#store[moduleName][tableId] = this.#store[moduleName][tableId] || {};
-		this.#store[moduleName][tableId][userId] = data;
+		this.#store[moduleName][tableId][userId] = { ...this.#store[moduleName][tableId][userId], ...data };
 	}
 
 	async has(moduleName, tableId, userId) {

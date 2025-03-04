@@ -15,6 +15,7 @@ export const useDocumentTemplate = () => {
 		try {
 			loading.value = true;
 			documentTemplate.value = await DocumentTemplateRepo.get({ id });
+			documentTemplate.value.requirements = documentTemplate.value.requirements || '';
 		} catch (e) {
 			notify.fetchError(e.message);
 			throw e;
@@ -27,7 +28,8 @@ export const useDocumentTemplate = () => {
 		try {
 			if (!documentTemplate.value || !documentTemplate.value.id) throw new Error('Для обновления шаблона документа у маршрута необходимо сначала вызвать функцию initDocumentTemplate');
 			loading.value = true;
-			documentTemplate.value = await DocumentTemplateRepo.get({ id: documentTemplate.value.id });		
+			documentTemplate.value = await DocumentTemplateRepo.get({ id: documentTemplate.value.id });
+			documentTemplate.value.requirements = documentTemplate.value.requirements || '';
 		} catch (e) {
 			notify.fetchError(e.message);
 			throw e;
@@ -66,7 +68,7 @@ export const useDocumentTemplate = () => {
 		} finally {
 			loading.value = false;
 		}
-	};	
+	};
 
 	/**
 	 * @param {number} id
@@ -82,18 +84,36 @@ export const useDocumentTemplate = () => {
 		} finally {
 			loading.value = false;
 		}
-	};	
+	};
+
+	/**
+	 * @param {number} id
+	 * @param {string} requirements
+	 * @returns {Promise<void>}
+	 */
+	const updateRequirements = async (id, requirements) => {
+		try {
+			loading.value = true;
+			await DocumentTemplateRepo.updateRequirements({ id, requirements });
+		} catch (e) {
+			notify.fetchError(e.message);
+			throw e;
+		} finally {
+			loading.value = false;
+		}
+	};
 
 	return {
 		loading,
 
-		documentTemplate,	
+		documentTemplate,
 		initDocumentTemplate,
 		updateDocumentTemplate,
-		remove,		
+		remove,
 		deactivate,
+		updateRequirements,
 
-		documentTemplatesTree,	
-		initDocumentTemplatesTree,		
+		documentTemplatesTree,
+		initDocumentTemplatesTree,
 	};
 };

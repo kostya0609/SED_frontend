@@ -1,0 +1,1 @@
+export { default as ApprovalRoutes } from './ApprovalRoutes.vue';

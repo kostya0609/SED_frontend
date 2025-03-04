@@ -10,6 +10,7 @@ export const useDocument = () => {
 
 	/**
 	* @param {number} document_id
+	* @returns {Promise<void>}
 	*/
 	const initDocument = async (document_id) => {
 		try {
@@ -27,6 +28,9 @@ export const useDocument = () => {
 		}
 	};
 
+	/**
+	 * @returns {Promise<void>}
+	 */
 	const updateDocument = async () => {
 		try {
 			if (!document.value || !document.value.id) throw new Error('Для обновления документа необходимо сначала вызвать функцию initDocument');
@@ -115,12 +119,51 @@ export const useDocument = () => {
 	 * @returns {boolean}
 	 */
 	const checkDocumentStatus = (statuses) => {
+		if (!document.value) {
+			return false;
+		}
+
 		if (Array.isArray(statuses)) {
 			return statuses.includes(document.value.status_id);
 		} else if (typeof statuses === 'number') {
 			return document.value.status_id === statuses;
 		} else {
 			throw new Error('Неверный формат статуса документа');
+		}
+	};
+
+	/**
+	 * @param {number} documentId
+	 * @returns {Promise<void>}
+	 */
+	const sendToApproval = async (documentId) => {
+		try {
+			loading.value = true;
+			document.value = await ESZRepo.sendToApproval(documentId);
+		}
+		catch (e) {
+			notify.fetchError(e.message);
+			throw e;
+		} finally {
+			loading.value = false;
+		}
+	};
+
+	/**
+	 * 
+	 * @param {number} documentId
+	 * @returns {Promise<void>}
+	 */
+	const sendToSignatory = async (documentId) => {
+		try {
+			loading.value = true;
+			document.value = await ESZRepo.sendToSignatory(documentId);
+		}
+		catch (e) {
+			notify.fetchError(e.message);
+			throw e;
+		} finally {
+			loading.value = false;
 		}
 	};
 
@@ -134,5 +177,7 @@ export const useDocument = () => {
 		checkDocumentRights,
 		getRights,
 		checkDocumentStatus,
+		sendToApproval,
+		sendToSignatory,
 	};
 };

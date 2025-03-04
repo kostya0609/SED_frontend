@@ -31,7 +31,7 @@ export const useGridsData = () => {
 
       gridsData[data.name] = {
         paginationData: { page: 1, count: 10 },
-        sortData: { name: "id", order: "desc" },
+        sortData: data.defaultSort ? data.defaultSort : { name: "id", order: "desc" },
         filterData: {},
         showValueFilter: [],
         activeProfile: null,

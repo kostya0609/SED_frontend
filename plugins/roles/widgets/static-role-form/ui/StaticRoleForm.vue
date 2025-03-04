@@ -1,108 +1,131 @@
-<template>
-  <Preloader :loading="loading">
-    <el-form
-      :model="formData"
-      :rules="rules"
-      label-width="auto"
-      label-position="left"
-      ref="form"
-      class="form"
-    >
-      <el-form-item
-        label="Наименование роли"
-        class="form__item"
-        prop="title"
+  <template>
+    <Preloader :loading="loading">
+      <el-form
+        :model="formData"
+        :rules="rules"
+        label-width="auto"
+        label-position="left"
+        ref="form"
+        class="form"
       >
-        <el-input
-          v-model="formData.title"
-          placeholder="Наименование роли"
-        />
-      </el-form-item>
+        <el-form-item
+          label="Наименование роли"
+          class="form__item"
+          prop="title"
+        >
+          <el-input
+            v-model="formData.title"
+            placeholder="Наименование роли"
+          />
+        </el-form-item>
 
-      <el-form-item
-        label="Активность"
-        class="form__item"
-        prop="is_active"
-      >
-        <Switch v-model="formData.is_active" />
-      </el-form-item>
-
-      <el-form-item
-        label="Описание логики работы роли"
-        class="form__item"
-        prop="description"
-      >
-        <el-input
-          v-model="formData.description"
-          type="textarea"
-          :rows="5"
-          placeholder="Введите текст"
-        />
-      </el-form-item>
-
-      <el-form-item
-        label="Участники"
-        class="form__item"
-        prop="users"
-      >
-      
-        <SearchUser
-          v-model="findUser"
-          @change="addUser"
-          class="form__input"
-        />
-
-        <el-table
-          :data="formData.users"
-          class="mt=2"
+        <el-form-item
+          label="Раздел"
+          class="form__item"
+          prop="partition_id"
         >
 
-          <el-table-column prop="_user">
-            <template #default="{ row }">
-              <UserLink :user="row" />
-            </template>
+          <el-tree-select
+            v-model="formData.partition_id"
+            :data="partitionsTree"
+            node-key="id"
+            clearable
+            check-strictly
+            :render-after-expand="false"
+            :props="{ label: 'title', children: 'children'}"
+            placeholder="Введите ID родительского раздела (по умолчанию раздел корневой)"
+          />
 
-          </el-table-column>
+        </el-form-item>
 
-          <el-table-column
-            prop="_actions"
-            width="60"
+        <el-form-item
+          label="Активность"
+          class="form__item"
+          prop="is_active"
+        >
+          <Switch v-model="formData.is_active" />
+        </el-form-item>
+
+        <el-form-item
+          label="Описание логики работы роли"
+          class="form__item"
+          prop="description"
+        >
+          <el-input
+            v-model="formData.description"
+            type="textarea"
+            :rows="5"
+            placeholder="Введите текст"
+          />
+        </el-form-item>
+
+        <el-form-item
+          label="Участники"
+          class="form__item"
+          prop="users"
+        >
+
+          <SearchUser
+            v-model="findUser"
+            @change="addUser"
+            class="form__input"
+          />
+
+          <el-table
+            :data="formData.users"
+            class="mt=2"
           >
-            <template #default="{ row }">
-              <el-space>
-                <el-button
-                  type="danger"
-                  icon="Delete"
-                  @click="deleteUser(row)"
-                />
-              </el-space>
-            </template>
-          </el-table-column>
 
-        </el-table>
-      </el-form-item>
+            <el-table-column prop="_user">
+              <template #default="{ row }">
+                <UserLink :user="row" />
+              </template>
 
-      <el-button
-        type="primary"
-        @click="submit"
-      >
-        Сохранить данные
-      </el-button>
+            </el-table-column>
 
-    </el-form>
-  </Preloader>
-</template>
+            <el-table-column
+              prop="_actions"
+              width="60"
+            >
+              <template #default="{ row }">
+                <el-space>
+                  <el-button
+                    type="danger"
+                    icon="Delete"
+                    @click="deleteUser(row)"
+                  />
+                </el-space>
+              </template>
+            </el-table-column>
+
+          </el-table>
+        </el-form-item>
+
+        <el-button
+          type="primary"
+          @click="submit"
+        >
+          Сохранить данные
+        </el-button>
+
+      </el-form>
+    </Preloader>
+  </template>
 
 <script setup>
 import { reactive, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from 'vue-router';
 import { Preloader, Switch, SearchUser, UserLink } from "@/plugins/roles/shared/ui";
 import { notify } from "@/plugins/roles/shared/utils";
 import { ElMessageBox } from "element-plus";
+
 import { useStaticRoleRepo } from '@/plugins/roles/entities/static-role/api';
+import { useStaticRolePartitionRepo } from '@/plugins/roles/entities/static-role-partition/api';
+import { usePartitionTree } from "@/plugins/roles/entities/static-role-partition/models";
 
 const props = defineProps({
   mode: String,
+  partition_id: { type: Number, default: null },
   data: {
     type: Object,
     required: false,
@@ -110,14 +133,19 @@ const props = defineProps({
   },
 });
 
+const StaticRolePartitionRepo = useStaticRolePartitionRepo();
+const { partitionsTree, initPartitionsTree, loading } = usePartitionTree(StaticRolePartitionRepo);
+
 const StaticRoleRepo = useStaticRoleRepo();
-const loading = ref(false);
+
 const router = useRouter();
+const route = useRoute();
 const form = ref();
 
 const rules = reactive({
   title: { required: true, message: 'Необходимо ввести наименование роли' },
-  description: { required: true, message: 'Необходимо ввести описание логики работы роли' },
+  partition_id: { required: true, message: 'Необходимо выбрать раздел' },
+  description: { required: false, message: 'Необходимо ввести описание логики работы роли' },
   users: { required: true, message: 'Необходимо указать Участников', trigger: 'blur' },
 });
 
@@ -125,8 +153,9 @@ const formData = reactive({
   id: null,
   title: null,
   description: null,
-  is_active: 1,
+  is_active: true,
   users: [],
+  partition_id: props.partition_id || '',
 });
 
 const findUser = ref(null);
@@ -189,16 +218,15 @@ if (props.mode === 'edit') {
   formData.users = participants.map(item => item.user)
 };
 
+await initPartitionsTree();
+
 watch([() => formData.users.length], () => {
   form.value.validateField(['users'], () => null);
 })
 
 </script>
 
-<style
-  scoped
-  lang="scss"
->
+<style scoped lang="scss">
 .form {
   &__item {}
 

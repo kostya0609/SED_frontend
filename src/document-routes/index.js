@@ -1,1 +1,2 @@
-export { App as DocumentRoutesModule } from './common/app';
+export { App as DocumentRoutesModule } from '@document-routes/common/app';
+export { usePartitionTree } from '@document-routes/partition';
