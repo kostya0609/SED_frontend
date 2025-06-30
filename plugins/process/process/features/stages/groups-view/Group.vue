@@ -7,6 +7,29 @@
 			table-layout="auto"
 		>
 			<el-table-column
+				prop="_action"
+				label=""
+				width="120"
+				align="center"
+				v-slot="{ row }"
+				v-if="isDebug"
+			>
+				<DeleteParticipantButton
+					:participant="row"
+					v-model:participants="group.participants"
+				/>
+			</el-table-column>
+			<el-table-column
+				prop="id"
+				label="Sort"
+				width="120"
+				align="center"
+				v-if="isDebug"
+				v-slot="{ row }"
+			>
+				<Copy>{{ row.sort }}</Copy>
+			</el-table-column>
+			<el-table-column
 				prop="id"
 				label="ID участника"
 				width="120"
@@ -132,6 +155,7 @@
 <script setup>
 import GroupStatus from './GroupStatus.vue';
 import ParticipantStatus from './ParticipantStatus.vue';
+import DeleteParticipantButton from './DeleteParticipantButton.vue';
 import { Copy, getDownloadLink, useProcessProvider, UserLink } from '@/plugins/process/common';
 
 const { isDebug } = useProcessProvider();

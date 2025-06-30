@@ -1,6 +1,5 @@
 <template>
 	<Preloader :loading="loading">
-
 		<el-breadcrumb
 			separator="/"
 			class="mb-3"

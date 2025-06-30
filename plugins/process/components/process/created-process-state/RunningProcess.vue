@@ -15,19 +15,20 @@
 				/>
 			</el-col>
 			<el-col :span="16">
-				<div class="running-process__action-buttons">
-					<el-popconfirm
-						title="Вы уверены, что хотите аннулировать бизнес-процесс?"
-						@confirm="cancellation"
-						width="200"
-						v-if="access.full || access.execute"
+				<div
+					class="running-process__action-buttons"
+					v-if="access.full || access.execute"
+				>
+					<el-button
+						type="primary"
+						@click="showModal"
 					>
-						<template #reference>
-							<el-button type="primary">
-								Аннулировать процесс
-							</el-button>
-						</template>
-					</el-popconfirm>
+						<slot>Аннулировать процесс</slot>
+					</el-button>
+					<CancellationConfirmModal
+						v-model:visible="dialogVisible"
+						@submit="cancellation"
+					/>
 				</div>
 			</el-col>
 		</el-row>
@@ -36,6 +37,7 @@
 <script setup>
 import { computed, inject, ref, watchEffect } from 'vue';
 import { notify } from '@/plugins/process/utils';
+import CancellationConfirmModal from './CancellationConfirmModal.vue';
 import Preloader from '@/plugins/process/components/common/Preloader.vue';
 import Stages from '@/plugins/process/components/process/stages/Stages.vue';
 import Action from '@/plugins/process/components/process/action/Action.vue';
@@ -68,6 +70,7 @@ const loading = ref(false);
 const participant = ref(null);
 const actions = ref([]);
 const showAction = computed(() => !!participant.value || actions.value.length > 0);
+const dialogVisible = ref(false);
 
 watchEffect(async () => {
 	const acts = getActiveStatus(props.process).stage.actions;
@@ -91,12 +94,13 @@ watchEffect(async () => {
 	});
 });
 
-const cancellation = async () => {
+const cancellation = async ({ comment }) => {
 	try {
 		loading.value = true;
 		const activeProcess = await ProcessRepo.cancellation({
 			process_id: props.process.id,
 			user_id: userId.value,
+			comment,
 		});
 
 		setActiveProcess(activeProcess);
@@ -108,6 +112,10 @@ const cancellation = async () => {
 	} finally {
 		loading.value = false;
 	}
+};
+
+const showModal = () => {
+	dialogVisible.value = true;
 };
 
 const loadParticipant = async () => {

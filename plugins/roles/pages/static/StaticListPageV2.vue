@@ -1,6 +1,5 @@
 <template>
 	<Preloader :loading="loading">
-
 		<el-breadcrumb
 			separator="/"
 			class="mb-3"
@@ -143,6 +142,28 @@
 						{{ formatDateTime(row.updated_at, formateDataTimeOptions) }}
 					</BsiTableColumn>
 
+					<BsiTableColumn
+						prop="participants"
+						label="Участники роли"
+						width="150"
+						v-slot="{ row }"
+					>
+						<template v-if="row.type == 'role' && row.participants && row.participants.length">
+
+							<UserLink
+								v-for="participant in row.participants"
+								:user="participant.user"
+								disable-photo
+								:full-name="false"
+							/>
+						</template>
+						
+						<template v-else>
+							-
+						</template>
+
+					</BsiTableColumn>
+
 				</BsiTable>
 			</div>
 		</div>
@@ -213,18 +234,18 @@ const filter = [
 ];
 
 const formateDataTimeOptions = {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
+	year: 'numeric',
+	month: 'numeric',
+	day: 'numeric',
+	hour: 'numeric',
+	minute: 'numeric',
 }
 
 await initPartitionsTree();
 await getBreadcrumbs({ id: route.params.partition_id });
 
 const clickPartition = async (partition) => {
-	if(partition.id != route.params.partition_id)
+	if (partition.id != route.params.partition_id)
 		await router.push({ path: `/sed/admin/roles/statics-v2/${partition.id}`, force: true });
 };
 
@@ -243,7 +264,7 @@ const deletePartitionMsg = (partition) => {
 		callback: async (action) => {
 			if (action !== 'confirm') {
 				return;
-			}			
+			}
 			await deletePartition({ id: partition.id });
 			await router.back();
 			await initPartitionsTree();

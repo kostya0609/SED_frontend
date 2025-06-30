@@ -1,6 +1,6 @@
 export class BaseRepository {
 	/** @var {string} _url адрес api */
-	_url = import.meta.env.PROD ? 'https://bitrix.bsi.local/api' : 'http://localhost';
+	_url = process.env.NODE_ENV === 'production' ? 'https://bitrix.bsi.local/api' : 'http://localhost';
 
 
 	/** @var {string} _version версия api на бэке */

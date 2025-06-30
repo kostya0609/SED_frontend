@@ -56,7 +56,6 @@ const errorMessage = ref(null);
 
 router.beforeEach(() => {
 	loading.value = true;
-	// errorMessage.value = null;
 });
 
 router.afterEach(() => {

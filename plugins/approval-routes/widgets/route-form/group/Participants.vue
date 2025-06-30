@@ -75,7 +75,7 @@
 				<el-space>
 					<el-tooltip
 						effect="dark"
-						content="Возможность удалить"
+						content="Возможность удалить 1"
 						placement="left-start"
 					>
 						<Switch v-model="row.can_deletable" />

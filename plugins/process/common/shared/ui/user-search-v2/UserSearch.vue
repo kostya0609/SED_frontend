@@ -14,8 +14,9 @@
 				:search-type="searchType"
 				@change="handleChange"
 				class="user-search-v2__search"
-				:onlyUser="onlyUser"
+				:only-user="onlyUser"
 				:items="items"
+				:disabled-select="disabledSelect"
 			/>
 		</div>
 		<UserList
@@ -24,8 +25,9 @@
 			@delete="handleDeleteItem"
 			@change="handleChangeInItemList"
 			v-if="items.length && !hideList"
-		/>
+		/>		
 	</div>
+
 </template>
 <script setup>
 import { computed, provide, ref, watchEffect } from 'vue';
@@ -90,6 +92,8 @@ const inputItems = defineModel({
 	default: null,
 });
 
+const disabledSelect = computed(() => !!(!props.multiple && items.value.length && !items.value[0].can_deletable) );
+
 if (props.multiple) {
 	if (!Array.isArray(inputItems.value)) {
 		throw new Error('Входные параметры должны быть массивом!');
@@ -107,6 +111,7 @@ if (props.multiple) {
 const showUserList = ref(1);
 
 const handleChange = (_item) => {
+
 	if (props.multiple) {
 		items.value.push(_item);
 
@@ -122,7 +127,7 @@ const handleChange = (_item) => {
 		inputItems.value = resultItems;
 		emit('change', resultItems);
 	}
-	
+
 	item.value = null;
 	showUserList.value = 1;
 };
@@ -143,7 +148,7 @@ const handleChangeInItemList = (items) => {
 	}
 };
 
-watchEffect(() => {
+watchEffect(() => {	
 	if (props.multiple) {
 		items.value = props.onlyUser ? outputTransfomerItems(inputItems.value) : inputItems.value;
 	} else {

@@ -14,7 +14,8 @@
 			:user-id="getUserId()"
 			:access="processAccesses"
 			module-name="SEDESZ"
-			:is-debug="checkUserRights('full_access')"
+			:is-debug="checkUserRights('dev_access')"
+			show-completed-processes
 		>
 			<h3 class="header_h3">
 				{{ document.number }}, статус - {{ document.status.title }}.
@@ -80,9 +81,16 @@
 					name="hierarchy"
 					lazy
 				>
-					<Hierarchy
-						:hierarchyTree="document.hierarchy"
-						:document_id="document.common_document_id"
+					<template v-if="checkUserRights('dev_access')">
+						<Hierarchy
+							:hierarchyTree="document.hierarchy"
+							:document_id="document.common_document_id"
+						/>
+						<el-divider />
+					</template>
+					<DocumentsHierarchy
+						:hierarchyTree="document.documents_hierarchy"
+						:document_id="document.document_hierarchy_id"
 					/>
 				</el-tab-pane>
 				<el-tab-pane
@@ -111,6 +119,7 @@ import { Description } from "@documents/esz/widgets/description";
 import { ApprovalESZ } from "@documents/esz/widgets/approval-esz";
 import { AdditionalInfo } from "@documents/esz/widgets/additional-info";
 import { Hierarchy } from "@documents/common/widgets/hierarchy";
+import { DocumentsHierarchy } from "@documents/common/widgets/documents-hierarchy";
 import { ChangeDataButton } from '@documents/esz/features/change-data';
 import { SendToApprovalButton } from '@documents/esz/features/send-to-approval';
 import { SendToSignatoryButton } from '@documents/esz/features/send-to-signatory';
@@ -141,8 +150,8 @@ const processAccesses = reactive({
 	/** Администратор по прежнему имеет полный доступ */
 	full: checkUserRights('full_access'),
 
-	/** Если документ на устранении замечаний, то блокируем возможность редактировать участников и запуск процеса */
-	/** Если документ на статусе Наложение резолюции, то блокируем возможность аннулировать процесс простым сотрудникам */
+	/** 1. Если документ на устранении замечаний, то блокируем возможность редактировать участников и запуск процеса */
+	/** 2. Если документ на статусе Наложение резолюции, то блокируем возможность аннулировать процесс простым сотрудникам */
 	execute: checkDocumentStatus([
 		DOCUMENT_STATUS.FIX_SIGNING,
 		DOCUMENT_STATUS.FIX_RESOLUTION,

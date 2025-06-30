@@ -18,7 +18,7 @@
             :data="documentTemplate"
             :routeId="+documentTemplate.route_id"
         />
-    </Preloader>
+    </Preloader>    
 </template>
 
 <script setup>

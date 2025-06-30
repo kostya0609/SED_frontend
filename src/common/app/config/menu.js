@@ -98,6 +98,17 @@ export const adminMenu = [
 				type: 'default'
 			},
 		],
+	},
+	{
+		title: 'Заместители',
+		path: '/sed/admin/subusers',
+		buttons: [
+			{
+				icon: 'Back',
+				path: '/sed/',
+				type: 'default'
+			},
+		],
 	}
 ];
 

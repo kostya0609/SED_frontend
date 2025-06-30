@@ -1,8 +1,7 @@
 <template>
-	<el-popconfirm
+	<DoubleConfirmPopover
 		title="Вы уверены, что хотите разрешить создание процесса?"
 		@confirm="deactivate"
-		width="300"
 		v-slot:reference
 	>
 		<el-button
@@ -11,12 +10,11 @@
 		>
 			<slot>Разрешить создание процесса</slot>
 		</el-button>
-	</el-popconfirm>
+	</DoubleConfirmPopover>
 </template>
 <script setup>
 import { ref } from 'vue';
-import { useActiveProcess } from '@/plugins/process/common';
-import { notify, useProcessProvider } from '@/plugins/process/common';
+import { notify, useProcessProvider, DoubleConfirmPopover, useActiveProcess } from '@/plugins/process/common';
 
 const { deactivateCompletedProcess } = useActiveProcess();
 const { templateId, documentId, userId } = useProcessProvider();

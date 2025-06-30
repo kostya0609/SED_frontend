@@ -10,9 +10,20 @@
 				/>
 			</template>
 			<template v-else-if="group.template_group.type_fill_id === GROUP_TYPE_FILL.FROM_LIST_TYPE">
+				<SelectParticipantFromList
+					:users="group.filled_participants"
+					@change="addFilledParticipantV2"
+					v-if="group.filled_participants.length"
+				/>
 				<SelectUserFromList
 					:users="group.template_group.filled_participants"
 					@change="addFilledParticipant"
+					v-else-if="group.template_group.filled_participants"
+				/>
+				<el-alert
+					type="warning"
+					title="В списке нет участников для выбора!"
+					v-else
 				/>
 			</template>
 			<template v-else>
@@ -33,6 +44,7 @@
 <script setup>
 import { computed, watch } from 'vue';
 import ParticipantsEdit from './ParticipantsEdit.vue';
+import SelectParticipantFromList from './SelectParticipantFromList.vue';
 import SelectUserFromList from './SelectUserFromList.vue';
 import { useParticipants } from '../model/useParticipants';
 import { useProcessSettings } from '@/plugins/process/process/components';
@@ -52,8 +64,6 @@ const classNames = computed(() => ({
 	'group--columns': columnOnPreparation.value,
 }));
 
-
-
 const handleAddItem = (item) => {
 	attachParticipant({ ...item, can_deletable: true }, props.group);
 };
@@ -70,6 +80,10 @@ const addFilledParticipant = (participant) => {
 		can_deletable: true,
 		user: { ...participant },
 	}, props.group);
+};
+
+const addFilledParticipantV2 = (participant) => {
+	attachParticipant(participant, props.group);
 };
 
 watch(() => props.group, group => {

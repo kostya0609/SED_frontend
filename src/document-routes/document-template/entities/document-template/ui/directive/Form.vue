@@ -45,8 +45,9 @@
 						prop="parents"
 					>
 						<SelectParentTemplate
-							v-model="parentObjects"
+							ref="selectParentTemplateRef"
 							v-model:result="formData.parents"
+							v-model:parents="parentObjects"
 							:disabled="formData.is_start"
 							:route-id="routeId"
 							:template-id="formData.id"
@@ -151,7 +152,7 @@
 
 				</el-form>
 			</el-col>
-		</el-row>
+		</el-row>		
 	</Preloader>
 </template>
 
@@ -202,8 +203,12 @@ const formData = reactive({
 	is_active: true,
 });
 
+const selectParentTemplateRef = ref();
+
 const handleChangeIsStart = () => {
-	formData.parents = [];
+	formData.parents = [];	
+	parentObjects.value= [];
+	selectParentTemplateRef.value.clearParentsView();
 };
 
 const checkParents = (rule, value, callback) => {
@@ -216,7 +221,7 @@ const checkParents = (rule, value, callback) => {
 
 const rules = reactive({
 	title: { required: true, message: 'Необходимо ввести название темы' },
-	parents: [{ validator: checkParents, trigger: 'blur' }],
+	parents: [{ validator: checkParents, trigger: 'change'}],
 	'data.content': { required: true, message: 'Необходимо ввести содержание документа' },
 	'data.days_amount': { required: false, message: 'Необходимо указать дни исполнения документа' },
 	'data.author': { required: false, message: 'Необходимо выбрать автора' },

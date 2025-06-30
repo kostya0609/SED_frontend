@@ -25,12 +25,15 @@
 				v-slot="{ row }"
 				width="600"
 			>
-				<span class="document-template-list__title">
+				<span
+					v-if="!row?.pivot || row?.pivot?.child_template_type == 'template'"
+					class="document-template-list__title"
+				>
 					<el-icon
 						size="small"
 						color="green"
 						title="Автозапуск документа включен"
-						v-if="getSetting(row.settings, SETTING.AUTORUN)"
+						v-if="getSetting(row?.settings, SETTING.AUTORUN)"
 					>
 						<VideoPlay />
 					</el-icon>
@@ -41,6 +44,11 @@
 						v-if="row.is_start"
 					>
 						<PriceTag />
+					</el-icon>
+					<el-icon						
+						title="Шаблон"
+					>
+						<Document />
 					</el-icon>
 
 					<el-link
@@ -54,6 +62,20 @@
 						{{ row.title }}
 					</el-link>
 				</span>
+
+				<span
+					v-if="row?.pivot?.child_template_type == 'partition'"
+					class="document-template-list__title"
+				>
+					<el-icon
+						size="16"
+						color="orange"
+						title="Папка"
+					>
+						<Folder />
+					</el-icon>
+					{{ row.title }}
+				</span>
 			</el-table-column>
 
 			<el-table-column
@@ -61,7 +83,7 @@
 				label="Тип"
 				v-slot="{ row }"
 			>
-				{{ row.type.title }}
+				{{ row?.type?.title || 'папка' }}
 			</el-table-column>
 
 			<el-table-column

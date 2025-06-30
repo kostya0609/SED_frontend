@@ -22,7 +22,7 @@ export const useParticipants = (initialParticipants = []) => {
 
 	const attachParticipant = async (item, group) => {
 		if (participants.value.find(participant => participant.id === item.id)) {
-			notify.error('Ошибка добавления участника!', `${item.title} уже есть в списке!`);
+			notify.error('Ошибка добавления участника!', `Этот участник уже есть в списке!`);
 			return;
 		}
 

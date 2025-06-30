@@ -22,7 +22,7 @@
 	>
 		<SelectDocumentTemplate
 			v-model:theme-title="formData.theme.theme_title"
-			v-model:tmp-doc-id="formData.theme.tmp_doc_id"
+			v-model:tmp-doc-id="formData.theme.tmp_doc_id"			
 			@change-template="handleChangeTemplate"
 			@reset-template="resetTemplate"
 			:document-type="DOCUMENT_TYPE.DIRECTIVE"

@@ -18,18 +18,19 @@
 <script setup>
 import Stage from './Stage.vue';
 import { computed } from 'vue';
-import { useActiveProcess } from '@/plugins/process/common';
-
-const { activeProcess } = useActiveProcess();
 
 const props = defineProps({
 	mode: {
 		required: true,
 		validator: mode => ['view', 'edit'].includes(mode),
 	},
+	stages: {
+		type: Array,
+		default: [],
+	}
 });
 
-const stages = computed(() => activeProcess.value.process.stages.filter(stage => {
+const stages = computed(() => props.stages.filter(stage => {
 	if (props.mode === 'edit') return true;
 
 	const groupsWithParticipants = stage.groups.filter(group => group.participants.length);

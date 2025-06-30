@@ -18,12 +18,13 @@
 			</el-form-item>
 		</template>
 		<template
-			v-slot:default="{ row, column }"
+			v-slot:default="{ row, column, $index }"
 			v-else
 		>
 			<slot
 				:column="column"
 				:row="row"
+				:$index="$index"
 			>
 				{{ row[column.property] }}
 			</slot>

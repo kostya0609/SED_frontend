@@ -63,7 +63,7 @@ const handleAddItem = (item) => {
 		static_role_id: static_role && static_role.id,
 		dynamic_role_id: dynamic_role && dynamic_role.id,
 		tmp_group_id: group.value.id,
-		can_deletable: false,
+		can_deletable: true,
 		sort: (group.value.preparation_participants.length && group.value.preparation_participants[group.value.preparation_participants.length - 1].sort) + 1,
 	});
 };

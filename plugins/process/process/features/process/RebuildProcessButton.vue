@@ -1,8 +1,7 @@
 <template>
-	<el-popconfirm
+	<DoubleConfirmPopover
 		title="Вы уверены, что хотите пересоздать процесс?"
 		@confirm="rebuild"
-		width="300"
 		v-slot:reference
 	>
 		<el-button
@@ -11,12 +10,11 @@
 		>
 			Пересоздать процесс
 		</el-button>
-	</el-popconfirm>
+	</DoubleConfirmPopover>
 </template>
 <script setup>
 import { ref } from 'vue';
-import { notify, useProcessProvider } from '@/plugins/process/common';
-import { useActiveProcess } from '@/plugins/process/common';
+import { useActiveProcess, DoubleConfirmPopover, notify, useProcessProvider } from '@/plugins/process/common';
 
 const { rebuildProcess } = useActiveProcess();
 const { templateId, documentId, userId, executorId } = useProcessProvider();

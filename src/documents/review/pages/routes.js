@@ -7,7 +7,7 @@ import DetailReviewPage from './DetailReviewPage.vue';
  */
 export const routes = [
 	{
-		path: '/documents/review/create/:parent_id?',
+		path: '/documents/review/create',
 		component: CreateReviewPage,
 	},
 	{

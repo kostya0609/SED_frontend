@@ -2,7 +2,7 @@
 	<el-scrollbar
 		class="form__scrollbar"
 		max-height="450"
-	>	
+	>
 		<el-tree
 			v-if="departmentsTree.length"
 			ref="treeRef"
@@ -22,7 +22,7 @@
 				/>
 			</template>
 		</el-tree>
-	</el-scrollbar>
+	</el-scrollbar>	
 </template>
 
 <script setup>
@@ -56,6 +56,27 @@ const checkedChildren = (data) => {
 	})
 };
 
+const unCheckedChildren = (data, isRootCall = true, parent_id = null) => {	
+	data.forEach(el => {
+
+		el.checked = false;
+
+		const index = departments.value.findIndex(dep_id => dep_id == el.id);
+
+		if (index !== -1) {
+			departments.value.splice(index, 1);
+		}
+
+		if (Array.isArray(el.children)) unCheckedChildren(el.children, false);
+
+	});
+
+	if (isRootCall) {
+		const index = departments.value.findIndex(dep_id => dep_id == parent_id);
+		if (index !== -1) departments.value.splice(index, 1);
+	};
+};
+
 const expendNodes = () => {
 	let parentNode = [];
 
@@ -75,12 +96,13 @@ const handleCheckChange = (data, event) => {
 		departments.value.push(+data.id);
 	}
 
-	if (!event && departments.value.includes(+data.id))
-		departments.value = departments.value.filter((dep_id) => dep_id != data.id);
+	if (event && Array.isArray(data.children)) {
+		checkedChildren(data.children);
+		expendNodes();
+	};
 
-	if (event && Array.isArray(data.children)) checkedChildren(data.children);
+	if (!event && Array.isArray(data.children)) unCheckedChildren(data.children, true, data.id);
 
-	expendNodes();
 }
 
 const depsTree = await DepartmentRepo.getTree({ view: 'normalize-tree' })

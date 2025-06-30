@@ -39,7 +39,7 @@
 					Выбрать
 				</el-button>
 			</div>
-		</template>
+		</template>		
 	</el-dialog>
 </template>
 

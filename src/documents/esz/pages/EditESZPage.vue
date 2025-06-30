@@ -20,6 +20,7 @@
 					:show-buttons-on-preparation="false"
 					column-on-preparation
 					:show-head="false"
+					hide-participants
 				/>
 			</Form>
 		</ProcessProvider>

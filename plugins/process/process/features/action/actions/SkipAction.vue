@@ -60,6 +60,10 @@ const groups = ref([]);
 
 const updateGroups = async () => {
 	try {
+		if (activeProcess.value.isCompleted()) {
+			return;
+		}
+
 		groups.value = await ProcessRepo.getParticipantsFromActiveStage({
 			process_id: activeProcess.value.process.id,
 		});

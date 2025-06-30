@@ -20,9 +20,15 @@ const props = defineProps({
 });
 
 const getDefaultAvatar = (gender) => {
-	return gender === 'F'
-		? 'assets/images/female.jpg'
-		: 'assets/images/male.jpg';
+	const path = gender === 'F'
+		? '/images/female.jpg'
+		: '/images/male.jpg';
+
+	if (process.env.NODE_ENV == 'development') {
+		return path;
+	}
+
+	return `/sed/dist${path}`;
 };
 
 const avatarStyle = computed(() => ({

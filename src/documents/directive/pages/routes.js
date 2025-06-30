@@ -7,7 +7,7 @@ import DetailDirectivePage from './DetailDirectivePage.vue';
  */
 export const routes = [
 	{
-		path: '/documents/directive/create/:parent_id?',
+		path: '/documents/directive/create',
 		component: CreateDirectivePage,
 	},
 	{

@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import { notify } from "@common/shared/utils";
 import { DirectiveRepo } from "@documents/directive/entities/directive/api";
+import { ApiError } from "@/common/shared/errors/ApiError";
 
 const document = ref(null);
 const documentRights = ref([]);
@@ -38,6 +39,12 @@ export const useDocument = () => {
 			documentRights.value = result.rights;
 
 		} catch (e) {
+
+			/** Временное решение, чтобы заместителю не показывать сообщение об ошибки, когда он принимает решение и его выкидывает из документа */
+			if (e instanceof ApiError && e.exception && /AccessDeniedException$/.test(e.exception)) {
+				throw e;
+			}
+
 			notify.fetchError(e.message);
 			throw e;
 		} finally {
@@ -136,8 +143,6 @@ export const useDocument = () => {
 		}
 	}
 
-
-
 	return {
 		document,
 		loading,
@@ -148,6 +153,6 @@ export const useDocument = () => {
 		sendToApproval,
 		checkDocumentRights,
 		getRights,
-		checkDocumentStatus,
+		checkDocumentStatus
 	}
 }

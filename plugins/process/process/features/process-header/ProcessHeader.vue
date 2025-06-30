@@ -13,17 +13,21 @@
 				{{ activeProcess.process.title }}
 			</template>
 		</div>
-		<SelectApprovalRoute class="process-header__select-route" />
+		<SelectApprovalRoute
+			class="process-header__select-route"
+			v-if="access.full"
+		/>
 	</div>
 </template>
 <script setup>
 import { inject } from 'vue';
-import { useActiveProcess } from '@/plugins/process/common';
+import { useActiveProcess, useProcessProvider } from '@/plugins/process/common';
 import { useProcessSettings } from '@/plugins/process/process/components';
 import { SelectApprovalRoute } from '@/plugins/process/process/features/select-approval-route';
 
 const { activeProcess } = useActiveProcess();
 const { showHead } = useProcessSettings();
+const { access } = useProcessProvider();
 
 const slots = inject('slots');
 </script>

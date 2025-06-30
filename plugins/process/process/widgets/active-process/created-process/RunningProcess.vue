@@ -21,6 +21,7 @@
 					:actions="actions"
 					@decide="onDecide"
 					@decided-with-interaction="onDecideWithInteraction"
+					@change-director-id="handleChangeDirectorId"
 					class="running-process__actions"
 					:supervisor-participants="supervisorParticipants"
 					v-if="showAction"
@@ -66,8 +67,9 @@ const getActiveStatus = (process) => {
 const loading = ref(false);
 const participant = ref(null);
 const actions = ref([]);
-const showAction = computed(() => !!participant.value || actions.value.length > 0);
+const showAction = computed(() => !!participant.value || actions.value.length > 0 || (supervisorParticipants.value && supervisorParticipants.value.participants.length > 0));
 const supervisorParticipants = ref(null);
+const directorId = ref(null);
 
 const checkPotentialSubuser = async () => {
 	supervisorParticipants.value = await ParticipantRepo.checkPotentialSubuser({
@@ -76,29 +78,84 @@ const checkPotentialSubuser = async () => {
 	});
 };
 
+/**
+ * Проверяет доступность действия для заместителя
+ * @param {Object} action - Действие для проверки
+ * @param {Boolean} is_participant - Флаг активного участника
+ * @returns {Boolean} - Доступно ли действие
+ */
+const checkActionForSupervisor = (action, is_participant) => {
+	const supervisor = supervisorParticipants.value;
+
+	// Заместитель активный участник и может принимать решения за других
+	if (supervisor.is_active && supervisor.participants.length) {
+		if (directorId.value) {
+			return checkActionForSpecificParticipant(action);
+		} else {
+			return checkActionForRegularUser(action, is_participant);
+		}
+	}
+
+	// Заместитель активный участник, но НЕ может принимать решения за других
+	if (supervisor.is_active && !supervisor.participants.length) {
+		return checkActionForRegularUser(action, is_participant);
+	}
+
+	// Заместитель НЕ активный участник, но может принимать решения за других
+	if (!supervisor.is_active && supervisor.participants.length && directorId.value) {
+		return checkActionForSpecificParticipant(action);
+	}
+
+	return false;
+};
+
+/**
+ * Проверяет доступность действия для конкретного участника
+ * @param {Object} action - Действие для проверки
+ * @returns {Boolean} - Доступно ли действие
+ */
+const checkActionForSpecificParticipant = (action) => {
+	return supervisorParticipants.value.participants.some(participant =>
+		participant.participant_type_id === action.who_access_id
+	);
+};
+
+/**
+ * Проверяет доступность действия для обычного пользователя
+ * @param {Object} action - Действие для проверки
+ * @param {Boolean} is_participant - Флаг активного участника
+ * @returns {Boolean} - Доступно ли действие
+ */
+const checkActionForRegularUser = (action, is_participant) => {
+	switch (action.who_access_id) {
+		case PARTICIPANT_TYPE.EXECUTOR:
+			return activeProcess.value ? activeProcess.value.process.user_id === userId.value : false;
+		case PARTICIPANT_TYPE.DOCUMENT_EXECUTOR:
+			return userId.value === executorId.value;
+		case PARTICIPANT_TYPE.PARTICIPANT:
+			return !!is_participant;
+		default:
+			return false;
+	}
+};
+
 watchEffect(async () => {
 	const acts = getActiveStatus(activeProcess.value.process).stage.actions;
 	const is_participant = participant.value;
 
-
 	actions.value = acts.filter(action => {
+		// Скрытые действия не показываем
 		if (action.is_hidden) {
 			return false;
 		}
 
-		if (supervisorParticipants.value && supervisorParticipants.value.participants.length > 0) {
-			return true;
+		// Проверка доступности действия для заместителя
+		if (supervisorParticipants.value) {
+			return checkActionForSupervisor(action, is_participant);
 		}
 
-		if (action.who_access_id === PARTICIPANT_TYPE.EXECUTOR) {
-			return activeProcess.value ? activeProcess.value.process.user_id === userId.value : false;
-		} else if (action.who_access_id === PARTICIPANT_TYPE.DOCUMENT_EXECUTOR) {
-			return userId.value === executorId.value;
-		} else if (action.who_access_id === PARTICIPANT_TYPE.PARTICIPANT) {
-			return !!is_participant;
-		} else {
-			return false;
-		}
+		// Стандартная проверка доступности действия
+		return checkActionForRegularUser(action, is_participant);
 	});
 });
 
@@ -139,6 +196,10 @@ const onDecide = async (_activeProcess, action) => {
 
 const onDecideWithInteraction = (_activeProcess, action) => {
 	emit('decidedWithInteraction', action);
+};
+
+const handleChangeDirectorId = (_directorId) => {
+	directorId.value = _directorId;
 };
 
 await loadParticipant();

@@ -152,10 +152,11 @@ const submit = async (callback) => {
 					observers: formData.observers,
 					theme_title: formData.theme.theme_title,
 					tmp_doc_id: formData.theme.tmp_doc_id,
+					root_tmp_id: formData.theme.tmp_doc_id,
+					parent_document_id:  +route.query.parent_id || null,
+					document_hierarchy_id: +route.query.document_hierarchy_id || null,
 				};
-
-				dto.parent_document_id = +route.params.parent_id || null;
-
+				
 				_document = await ESZRepo.preCreate(dto);
 				if (formData.main.length > 0 || formData.additional.length > 0) {
 					files = getFormDataFileList(_document.id)
@@ -207,7 +208,7 @@ const save = async () => {
 		 */
 
 		document.value = _document;
-		router.push(createDocumentLink(_document.type_id, 'detail', _document.id));		
+		router.push(createDocumentLink(_document.type_id, 'detail', _document.id));
 	});
 };
 

@@ -41,6 +41,7 @@
 						/>
 					</el-select>
 				</el-form-item>
+				
 				<template v-if="data.action">
 					<PositiveAction
 						v-if="data.action.template_action_id === TEMPLATE_ACTION.POSITIVE_ACTION"
@@ -137,7 +138,7 @@ const props = defineProps({
 	},
 });
 
-const emit = defineEmits(['decide', 'decidedWithInteraction']);
+const emit = defineEmits(['decide', 'decidedWithInteraction', 'changeDirectorId']);
 
 const data = reactive({
 	action: null,
@@ -209,6 +210,8 @@ const save = async () => {
 
 			const _activeProcess = await decide(payload);
 
+			activeProcess.value = _activeProcess;
+
 			emit('decide', _activeProcess, data.action);
 			actionEmitter.emit('decide', getRawData(data));
 
@@ -218,10 +221,8 @@ const save = async () => {
 			}
 
 			if (_activeProcess.isCreated() && _activeProcess.process.isRunned()) {
-				form.value.resetFields();
+				form.value && form.value.resetFields();
 			}
-
-			activeProcess.value = _activeProcess;
 		} catch (e) {
 			notify.fetchError(e.message);
 			throw e;
@@ -237,16 +238,6 @@ watch(() => data.action, () => {
 	!!(fields.length && form.value) && form.value.resetFields(fields);
 });
 
-watch(() => props.actions, (actions) => {
-	if (actions.length > 0) {
-		data.action = actions[0];
-		actionId.value = actions[0].id;
-	} else {
-		data.action = null;
-		actionId.value = null;
-	}
-}, { immediate: true });
-
 watch(() => actionId.value, () => {
 	data.action = props.actions.find(action => action.id === actionId.value);
 });
@@ -254,6 +245,10 @@ watch(() => actionId.value, () => {
 watch(() => props.supervisorParticipants, (supervisorParticipants) => {
 	rules.value.directorId.required = !!supervisorParticipants ? !supervisorParticipants.is_active && supervisorParticipants.participants.length > 1 : true;
 }, { immediate: true });
+
+watch(() => data.directorId, (directorId) => {
+	emit('changeDirectorId', directorId || null);
+});
 
 provide('data', data);
 provide('form', form);

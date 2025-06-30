@@ -35,6 +35,10 @@ const props = defineProps({
 	isDebug: {
 		type: Boolean,
 		default: false,
+	},
+	showCompletedProcesses: {
+		type: Boolean,
+    default: false,
 	}
 });
 

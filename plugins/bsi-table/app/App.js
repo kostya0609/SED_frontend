@@ -1,4 +1,5 @@
 import { VariableStore } from '@/plugins/bsi-table/entities/setting';
+import { API_OPTIONS_KEY } from '@/plugins/bsi-table/shared/symbols';
 
 export default {
 	/**
@@ -22,5 +23,6 @@ export default {
 		app.provide('moduleName', options.module);
 		app.provide('userId', options.userId);
 		app.provide('table-local-store', new VariableStore());
+		app.provide(API_OPTIONS_KEY, options.API);
 	}
 };

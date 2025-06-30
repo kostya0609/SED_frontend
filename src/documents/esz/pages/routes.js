@@ -7,7 +7,7 @@ import DetailESZPage from './DetailESZPage.vue';
  */
 export const routes = [
 	{
-		path: '/documents/esz/create/:parent_id?',
+		path: '/documents/esz/create',
 		component: CreateESZPage,
 	},
 	{

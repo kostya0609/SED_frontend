@@ -94,4 +94,12 @@ const handleDropdownCommand = async (command, partition) => {
 .el-dropdown-link:focus-visible {
     outline: none;
 }
+
+.tree ::v-deep(.el-tree-node__content) {
+    height: auto!important;
+}
+
+.tree ::v-deep(.el-tree-node) {
+    white-space:normal!important;
+}
 </style>

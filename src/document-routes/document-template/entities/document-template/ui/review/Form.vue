@@ -33,11 +33,12 @@
 						prop="parents"
 					>
 						<SelectParentTemplate
-							v-model="parentObjects"
+							v-model:parents="parentObjects"
 							v-model:result="formData.parents"
 							:disabled="formData.is_start"
 							:route-id="routeId"
 							:template-id="formData.id"
+							ref="selectParentTemplateRef"
 						/>
 					</el-form-item>
 
@@ -98,7 +99,7 @@
 
 				</el-form>
 			</el-col>
-		</el-row>
+		</el-row>		
 
 	</Preloader>
 </template>
@@ -146,11 +147,16 @@ const formData = reactive({
 	is_active: true,
 });
 
+const selectParentTemplateRef = ref();
+
 const handleChangeIsStart = () => {
 	formData.parents = [];
+	parentObjects.value = [];
+	selectParentTemplateRef.value.clearParentsView();
 };
 
 const checkParents = (rule, value, callback) => {
+
 	if (!formData.is_start && !value.length) {
 		return callback(new Error('Необходимо указать родительские документы или сделать шаблон стартовым!'));
 	} else {
@@ -160,12 +166,13 @@ const checkParents = (rule, value, callback) => {
 
 const rules = reactive({
 	title: { required: true, message: 'Необходимо ввести название темы' },
-	parents: [{ validator: checkParents, trigger: 'blur' }],
+	parents: [{ validator: checkParents, trigger: 'change' }],
 	'data.content': { required: true, message: 'Необходимо ввести содержание документа' },
 	'data.receivers': { required: false, message: 'Необходимо выбрать получающих ознакомление' },
 });
 
-const submit = async () => {
+const submit = async () => {	
+
 	form.value.validate(async (isValid) => {
 		try {
 			if (!isValid) return;
@@ -213,7 +220,9 @@ if (props.mode === 'edit') {
 };
 
 watch([() => formData.is_start], () => {
-	form.value.validateField(['parents']);
+
+	if (!formData.is_start) form.value.validateField(['parents']);
+
 });
 </script>
 

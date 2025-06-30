@@ -1,8 +1,7 @@
 <template>
-	<el-popconfirm
+	<DoubleConfirmPopover
 		title="Вы уверены, что хотите принудительно создать процесс?"
 		@confirm="create"
-		width="300"
 		v-slot:reference
 	>
 		<el-button
@@ -11,12 +10,11 @@
 		>
 			<slot>Принудительно создать процесс</slot>
 		</el-button>
-	</el-popconfirm>
+	</DoubleConfirmPopover>
 </template>
 <script setup>
 import { inject, ref } from 'vue';
-import { useActiveProcess } from '@/plugins/process/common';
-import { notify, useProcessProvider } from '@/plugins/process/common';
+import { notify, useProcessProvider, DoubleConfirmPopover, useActiveProcess } from '@/plugins/process/common';
 
 const { createProcess } = useActiveProcess();
 const { templateId, documentId, executorId, userId } = useProcessProvider();

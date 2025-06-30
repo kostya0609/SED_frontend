@@ -19,20 +19,23 @@
 	</el-input>
 
 	<SelectParentModal
-		:route-id="routeId"
-		:template-id="templateId"
 		v-model:show="showParentModal"
 		v-model:result="result"
+		:route-id="routeId"
+		:template-id="templateId"
 		v-model:current-parents="parents"
 		@change="handleChangeParent"
 	/>
+	
 </template>
 <script setup>
 import { ref, watch } from 'vue';
 import SelectParentModal from './SelectParentModal.vue';
 
 const result = defineModel('result', { required: true, type: Array });
-const parents = defineModel({ default: [] });
+
+const parents = defineModel('parents', { required: true, type: Array });
+
 const emit = defineEmits(['change']);
 
 const props = defineProps({
@@ -47,23 +50,27 @@ const props = defineProps({
 	templateId: {
 		required: false,
 		type: Number,
-	}
+	},
+});
+
+defineExpose({
+	clearParentsView: () => {		
+		parentsView.value = [];	
+	},
 });
 
 const showParentModal = ref(false);
 const parentsView = ref([]);
 
-const handleChangeParent = (_parents, _result) => {
-	parents.value = _parents;
-	result.value = _result;
-	showParentModal.value = false;
+const handleChangeParent = () => {	
+	parentsView.value = result.value.map(item => item.parent_template_title).join(', ');		
+	showParentModal.value = false;	
 };
 
 const handleClickSelectButton = () => {
 	showParentModal.value = true;
 };
 
-watch(() => parents.value, parents => {
-	parentsView.value = parents.map(template => template.title).join(', ');
-}, { immediate: true });
+parentsView.value = parents.value.map(item => `${item?.type?.title} ${item?.title}`).join(', ');		
+
 </script>

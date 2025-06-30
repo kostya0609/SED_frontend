@@ -9,14 +9,15 @@
 		</slot>
 	</el-button>
 
-	<CreateBasedModal
+	<CreateBasedModalTree
 		v-model:show="showBasedModal"
 		:document="document"
 		:create="createDocuments"
 	/>
+	
 </template>
 <script setup>
-import CreateBasedModal from './CreateBasedModal.vue';
+import { CreateBasedModal,CreateBasedModalTree } from './';
 import { BasedCreationRepo } from '@documents/common/shared/api';
 import { notify } from '@common/shared/utils';
 import { ref } from 'vue';
@@ -34,7 +35,7 @@ const emit = defineEmits(['created']);
 const loading = ref(false);
 const showBasedModal = ref(false);
 
-const createDocuments = async (document_id, checkTmpDocs, selectedType) => {
+const createDocuments = async ({ common_document_id, checkTmpDocs, selectedType, documentHierarchyId }) => {
 	const left = ref(0);
 	const top = ref(0);
 
@@ -42,7 +43,7 @@ const createDocuments = async (document_id, checkTmpDocs, selectedType) => {
 		try {
 			loading.value = true;
 			let new_documents = await BasedCreationRepo.createForm({
-				based_document_id: document_id,
+				based_document_id: common_document_id,
 				template_ids: checkTmpDocs.value,
 			});
 
@@ -52,7 +53,7 @@ const createDocuments = async (document_id, checkTmpDocs, selectedType) => {
 				let link = createDocumentLink(doc.type.id, 'detail', doc.document_id);
 				window.open(link, '_blank', `popup=false, width=1000, height=600, left=${100 * left.value}, top=${100 * top.value}`);
 				left.value++; top.value++;
-			});		
+			});
 
 		} catch (e) {
 			notify.fetchError(e.message);
@@ -63,7 +64,7 @@ const createDocuments = async (document_id, checkTmpDocs, selectedType) => {
 	}
 
 	selectedType.value.forEach((type) => {
-		let link = `${createDocumentLink(type, 'create')}/${document_id}`;
+		let link = `${createDocumentLink(type, 'create')}/?parent_id=${common_document_id}&document_hierarchy_id=${documentHierarchyId}`;
 		window.open(link, '_blank', `popup=false, width=1000, height=600, left=${100 * left.value}, top=${100 * top.value}`);
 		left.value++; top.value++;
 	});

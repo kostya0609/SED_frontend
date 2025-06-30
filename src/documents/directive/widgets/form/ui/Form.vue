@@ -93,7 +93,7 @@ const formData = reactive({
 
 	theme: {
 		theme_title: '',
-		tmp_doc_id: null,
+		tmp_doc_id: null,		
 	}
 
 });
@@ -123,11 +123,17 @@ const submit = async () => {
 				observers: formData.observers,
 				theme_title: formData.theme.theme_title,
 				tmp_doc_id: formData.theme.tmp_doc_id,
+				root_tmp_id: null,
+				parent_document_id: null,
+				document_hierarchy_id: null
 			};
 
 			if (props.mode === 'create') {
 
-				dto.parent_document_id = +route.params.parent_id || null;
+				dto.root_tmp_id = formData.theme.tmp_doc_id;
+
+				dto.parent_document_id = +route.query.parent_id || null;
+				dto.document_hierarchy_id = +route.query.document_hierarchy_id || null;
 
 				_document = await DirectiveRepo.preCreate(dto);
 				if (formData.main.length > 0) {
@@ -139,7 +145,8 @@ const submit = async () => {
 
 				broadcastChannel.postMessage('Документ создан');
 
-			} else {
+			} else {				
+
 				_document = await DirectiveRepo.update(dto);
 				files = getFormDataFileList(_document.id)
 					.append(formData.main, 'main')
@@ -183,7 +190,7 @@ if (props.mode === 'edit') {
 		observers,
 
 		main_files,
-		theme,
+		theme		
 	} = props.data;
 
 	formData.id = id;

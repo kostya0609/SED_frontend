@@ -1,8 +1,7 @@
 <template>
-	<el-popconfirm
+	<DoubleConfirmPopover
 		title="Вы уверены, что хотите удалить процесс?"
 		@confirm="remove"
-		width="300"
 		v-slot:reference
 	>
 		<el-button
@@ -11,12 +10,12 @@
 		>
 			<slot>Удалить процесс</slot>
 		</el-button>
-	</el-popconfirm>
+	</DoubleConfirmPopover>
 </template>
 <script setup>
 import { inject, ref } from 'vue';
 import { notify, useProcessProvider } from '@/plugins/process/common';
-import { useActiveProcess } from '@/plugins/process/common';
+import { useActiveProcess, DoubleConfirmPopover } from '@/plugins/process/common';
 
 const { deleteProcess, activeProcess } = useActiveProcess();
 const { userId } = useProcessProvider();

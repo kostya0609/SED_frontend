@@ -76,15 +76,14 @@
 					</el-icon>
 				</template>
 				{{ template.type.title }}. {{ template.title }}
-			</el-button>
-
-			<!-- TODO: template.children - не такого, проверить данную ошибку и доработать компонент -->
-			<PartitionList
+			</el-button>			
+			
+			<!-- <PartitionList
 				v-if="template.children && template.children.length"
 				:templates="template.children"
 				v-model="activeDocumentTemplate"
 				v-model:active-item="activeItem"
-			/>
+			/> -->
 		</li>
 	</ul>
 </template>

@@ -1,4 +1,4 @@
-<template>
+<template>	
 	<EditDirectivePage
 		hide-back-button
 		v-if="isDraft"
@@ -14,7 +14,8 @@
 			:user-id="getUserId()"
 			:access="processAccesses"
 			module-name="SEDDirective"
-			:is-debug="checkUserRights('full_access')"
+			:is-debug="checkUserRights('dev_access')"
+			show-completed-processes
 		>
 			<h3 class="header_h3">
 				{{ document.number }}, статус {{ document.status.title }}
@@ -71,9 +72,16 @@
 					name="hierarchy"
 					lazy
 				>
-					<Hierarchy
-						:hierarchyTree="document.hierarchy"
-						:document_id="document.common_document_id"
+					<template v-if="checkUserRights('dev_access')">
+						<Hierarchy
+							:hierarchyTree="document.hierarchy"
+							:document_id="document.common_document_id"
+						/>
+						<el-divider />
+					</template>
+					<DocumentsHierarchy
+						:hierarchyTree="document.documents_hierarchy"
+						:document_id="document.document_hierarchy_id"
 					/>
 				</el-tab-pane>
 				<el-tab-pane
@@ -103,13 +111,14 @@ import { Description } from "@documents/directive/widgets/description";
 import { ApprovalDirective } from "@documents/directive/widgets/approval-directive";
 import { AdditionalInfo } from "@documents/directive/widgets/additional-info";
 import { Hierarchy } from "@documents/common/widgets/hierarchy";
+import { DocumentsHierarchy } from "@documents/common/widgets/documents-hierarchy";
 import { ChangeDataButton } from '@documents/directive/features/change-data';
 import { SendToApprovalButton } from '@documents/directive/features/send-to-approval';
 import { DocumentCancelButton } from '@documents/directive/features/document-cancel';
 import { useActiveTab, useDocument } from "@documents/directive/entities/directive";
 import { useUser } from "@/common/app/composables";
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { DOCUMENT_STATUS } from '@documents/directive/entities/directive/constants';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { DOCUMENT_STATUS, PROCESS_TEMPLATE } from '@documents/directive/entities/directive/constants';
 import { CreateBasedButton } from '@documents/common/features/create-based-on';
 import { ApprovalRoutesRepo } from '@documents/common/shared/api';
 import { notify, formatDate } from "@common/shared/utils";
@@ -121,27 +130,31 @@ const route = useRoute();
 const router = useRouter();
 const { getUserId, checkUserRights } = useUser();
 const { activeTab, setActiveTab } = useActiveTab();
-const { document, loading, initDocument, updateDocument, checkDocumentRights, checkDocumentStatus } = useDocument();
+const { document, loading, initDocument, updateDocument, checkDocumentRights, checkDocumentStatus, checkDocumentExecutorOrAuthor } = useDocument();
 const { addButton, clearButtons } = useActionButtons();
 
 await initDocument(route.params.id);
 
 const { activeList } = useActiveList();
 
-const isEdit = computed(() => checkDocumentRights('document_full_access') && checkDocumentStatus(DOCUMENT_STATUS.PREPARATION));
+const isEdit = computed(() =>  checkDocumentRights('document_full_access') && checkDocumentStatus(DOCUMENT_STATUS.PREPARATION));
 
 const isCancel = computed(() => checkDocumentRights('document_full_access') && checkDocumentStatus([DOCUMENT_STATUS.PREPARATION]));
 
 const isDraft = computed(() => checkDocumentStatus(DOCUMENT_STATUS.DRAFT));
 
-const processAccesses = {
+const canExecuteProcess = () => {
+	return checkUserRights('full_access') || (document.value.process_template_id == PROCESS_TEMPLATE.DIRECTIVE_EXECUTION && checkDocumentRights('document_full_access') && checkDocumentStatus(DOCUMENT_STATUS.EXECUTION_IN_WORK));
+};
+
+const processAccesses = ref( {
 	full: checkUserRights('full_access'),
 
 	/** Аннулировать процесс простой смертный не может (только админ). Инициатор процесса может аннулировать процесс только выбрав спец. действие - запросить аннулирование */
-	execute: checkUserRights('full_access'),
+	execute: canExecuteProcess(),
 
 	selectRoles: checkUserRights('full_access'),
-};
+});
 
 const documentForProcess = {
 	id: document.value.id,
@@ -195,5 +208,9 @@ onUnmounted(() => {
 	broadcastChannel.close();
 	clearButtons();
 });
+
+watch(() => document.value.status, () => {
+	processAccesses.value.execute = canExecuteProcess();
+}, { immediate: true });
 
 </script>

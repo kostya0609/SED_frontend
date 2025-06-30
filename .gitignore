@@ -29,6 +29,10 @@ coverage
 
 *.tsbuildinfo
 
-./src/common/app/config/plugins.js
 dist/*
 .npm
+
+.htaccess
+index.php
+test/*
+.env.production

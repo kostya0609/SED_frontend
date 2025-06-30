@@ -28,9 +28,7 @@ deploy-job:
   script:
     - rm -rf /sed-dist/*
     - cp -r dist/* /sed-dist
-  only:
-    - main
-
+  
 # Этап для теста
 deploy-test-job:
   stage: deploy-test
@@ -39,6 +37,4 @@ deploy-test-job:
     - build-job
   script:
     - rm -rf /sed-test/*
-    - cp -r dist/* /sed-test
-  only:
-    - main
+    - cp -r dist/* /sed-test  

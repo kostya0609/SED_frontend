@@ -22,7 +22,7 @@
 					:href="createDocumentLink(row.type_id, 'detail', row.document_id)"
 					@click="handleClickLink"
 				>
-					{{ row.number }}
+				{{ row.number }}
 				</Link>
 			</BsiTableColumn>
 			<BsiTableColumn
@@ -42,6 +42,28 @@
 				prop="theme"
 				label="Тема документа"
 			/>
+			<BsiTableColumn
+				prop="content"
+				label="Содержание"
+				width="300"
+				v-slot="{ row }"
+			>
+				<el-popover
+					placement="top-start"
+					:width="500"
+					trigger="click"
+					:content="row.content"
+				>
+					<template #reference>
+						<el-text
+							truncated
+							class="cursor-pointer"
+						>
+							{{ row.content }}
+						</el-text>
+					</template>
+				</el-popover>
+			</BsiTableColumn>
 			<BsiTableColumn
 				prop="initiator_id"
 				label="Инициатор"

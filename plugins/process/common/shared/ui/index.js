@@ -9,3 +9,4 @@ export { default as UserTable } from './UserTable.vue';
 export { SearchUserExtra } from './search-user-extra';
 export { RoleLink } from './user-search-v2';
 export { default as UserSearchV2 } from './UserSearchV2.vue';
+export { default as DoubleConfirmPopover } from './DoubleConfirmPopover.vue';

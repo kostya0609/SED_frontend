@@ -33,11 +33,12 @@
 						prop="parents"
 					>
 						<SelectParentTemplate
-							v-model="parentObjects"
+							ref="selectParentTemplateRef"
 							v-model:result="formData.parents"
+							v-model:parents="parentObjects"
 							:route-id="routeId"
 							:disabled="formData.is_start"
-							:template-id="formData.id"
+							:template-id="formData.id"							
 						/>
 					</el-form-item>
 
@@ -126,8 +127,8 @@
 				</el-form>
 			</el-col>
 		</el-row>
-	</Preloader>
-
+		
+	</Preloader>	
 </template>
 <script setup>
 import { ref, reactive, watch } from 'vue';
@@ -174,7 +175,10 @@ const formData = reactive({
 	is_active: true,
 });
 
-const checkParents = (rule, value, callback) => {
+const selectParentTemplateRef = ref();
+
+const checkParents = (rule, value, callback) => {	
+
 	if (!formData.is_start && !value.length) {
 		return callback(new Error('Необходимо указать родительские документы или сделать шаблон стартовым!'));
 	} else {
@@ -184,14 +188,16 @@ const checkParents = (rule, value, callback) => {
 
 const rules = reactive({
 	title: { required: true, message: 'Необходимо ввести название темы' },
-	parents: [{ validator: checkParents, trigger: 'blur' }],
+	parents: [{ validator: checkParents, trigger: 'change' }],
 	'data.content': { required: true, message: 'Необходимо ввести содержание документа' },
 	'data.signatory': { required: false, message: 'Необходимо выбрать подписанта' },
 	'data.receivers': { required: false, message: 'Необходимо выбрать адресата' },
 	'data.observers': { required: false, message: 'Необходимо выбрать наблюдателя' },
+	
 });
 
 const submit = async () => {
+	
 	form.value.validate(async (isValid) => {
 		try {
 			if (!isValid) return;
@@ -219,6 +225,8 @@ const submit = async () => {
 
 const handleChangeIsStart = () => {
 	formData.parents = [];
+	parentObjects.value= [];
+	selectParentTemplateRef.value.clearParentsView();
 };
 
 if (props.mode === 'edit') {
@@ -233,7 +241,7 @@ if (props.mode === 'edit') {
 
 	formData.id = id;
 	formData.title = title;
-	parentObjects.value = parents;
+	parentObjects.value = parents;	
 	formData.data.content = data.content;
 	formData.data.signatory = data.signatory;
 	formData.data.receivers = data.receivers ?? [];

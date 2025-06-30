@@ -7,7 +7,10 @@
 				v-if="showStatuses"
 			/>
 			<Preloader :loading="loading">
-				<Stages mode="edit" />
+				<Stages
+					:stages="activeProcess.process.stages"
+					mode="edit"
+				/>
 			</Preloader>
 			<div
 				class="preparing-process__actions"
@@ -36,9 +39,11 @@ import { ProcessHeader } from '@/plugins/process/process/features/process-header
 import { useApprovalRoute } from '@/plugins/process/process/features/select-approval-route';
 import { DeleteProcessButton, RebuildProcessButton, RunProcessButton } from '@/plugins/process/process/features/process';
 import { useProcessSettings } from '@/plugins/process/process/components';
+import { useActiveProcess } from '@/plugins/process/common';
 
 const { loading } = useApprovalRoute();
 const { showStatuses, showButtonsOnPreparation } = useProcessSettings();
+const { activeProcess } = useActiveProcess();
 
 const access = inject('access');
 </script>

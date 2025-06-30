@@ -113,10 +113,16 @@ const submit = async () => {
 				receivers: formData.receivers,
 				theme_title: formData.theme.theme_title,
 				tmp_doc_id: formData.theme.tmp_doc_id,
+				root_tmp_id: null,
+				parent_document_id: null,
+				document_hierarchy_id: null
 			};
 
 			if (props.mode === 'create') {
-				dto.parent_document_id = +route.params.parent_id || null;
+
+				dto.root_tmp_id = formData.theme.tmp_doc_id;
+				dto.parent_document_id = +route.query.parent_id || null;
+				dto.document_hierarchy_id = +route.query.document_hierarchy_id || null;
 
 				_document = await ReviewRepo.preCreate(dto);
 				if (formData.main.length > 0) {
@@ -146,7 +152,7 @@ const submit = async () => {
 			document.value = _document;
 
 			link = createDocumentLink(_document.type_id, 'detail', _document.id);
-			router.push(link);			
+			router.push(link);
 
 		} catch (e) {
 			notify.fetchError(e.message);

@@ -293,4 +293,28 @@ export class ProcessRepository extends BaseRepository {
 		return result.data || false;
 	}
 
+	/**
+	 * 
+	 * @param {{
+	 * 	document_id: number
+	 * template_id: number
+	 * }} payload 
+	 * @returns {Promise<any[]>}
+	 */
+	async getCompletedProcesses(payload) {
+		const result = await this._query({
+			payload,
+			nestedEndpoint: 'get-completed-processes',
+		});
+
+		if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
+
+		return result.data;
+	}
 }

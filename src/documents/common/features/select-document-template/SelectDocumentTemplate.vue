@@ -83,13 +83,13 @@ const clear = () => {
 	}
 
 	themeTitle.value = '';
-	tmpDocId.value = null;
+	tmpDocId.value = null;	
 	disabled.value = false;
 	_template.value = null;
 };
 
 const handleChangeTmpDoc = (template) => {
-	tmpDocId.value = template.id;
+	tmpDocId.value = template.id;	
 	themeTitle.value = template.title;
 	disabled.value = true;
 

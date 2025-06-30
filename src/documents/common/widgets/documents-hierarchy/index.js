@@ -1,0 +1,1 @@
+export { default as DocumentsHierarchy } from './DocumentsHierarchy.vue';

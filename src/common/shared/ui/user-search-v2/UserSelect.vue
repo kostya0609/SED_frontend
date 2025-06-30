@@ -28,6 +28,7 @@
 		:placeholder="placeholder"
 		@change="handleChange"
 		v-bind="$attrs"
+		:disabled="disabledSelect"
 		v-else
 	>
 		<el-option
@@ -38,6 +39,7 @@
 			:disabled="disabledOption(option.id)"
 		/>
 	</el-select>
+	
 </template>
 <script setup>
 import { computed, inject, ref, watch } from 'vue';
@@ -59,6 +61,10 @@ const props = defineProps({
 		type: Array,
 		required: true,
 	},
+	disabledSelect: {
+		type: Boolean,
+		default: false
+	}
 });
 
 const placeholder = computed(() => {
@@ -170,7 +176,7 @@ const searchStaticRoles = async (query) => {
 	oldQuery = query;
 };
 
-const handleChange = (item) => {
+const handleChange = (item) => {	
 	options.value = [];
 	emit('change', item);
 };

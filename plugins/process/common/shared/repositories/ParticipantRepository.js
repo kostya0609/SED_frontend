@@ -171,4 +171,49 @@ export class ParticipantRepository extends BaseRepository {
 
 		return result.data;
 	}
+
+	/**
+	 * 
+	 * @param {{ process_id: number, participant_id: number, user_id: number }} payload 
+	 * @returns {Promise<any>}
+	 */
+	async deleteParticipant(payload) {
+		const result = await this._query({
+			payload,
+			nestedEndpoint: 'delete',
+		});
+
+		if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
+
+		return result.data;
+	}
+
+	/**
+	 * Проверяет пользователя на участие в процессе
+	 * 
+	 * @param {{ user_id: number, template_id: number, document_id: number }} payload 
+	 * @returns {Promise<boolean>}
+	 */
+	async checkParticipant(payload) {
+		const result = await this._query({
+			payload,
+			nestedEndpoint: 'check-participant',
+		});
+
+		if (!result.success) {
+			if (result.errors) {
+				throw new Error(Object.values(result.errors).join('\n'));
+			}
+
+			throw new Error(result.message);
+		}
+
+		return result.data.is_participant;
+	}
 }

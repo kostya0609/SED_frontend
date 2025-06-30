@@ -11,23 +11,31 @@
 		@participant-count-changed="onParticipantCountChanged"
 		:approval-routes="approvalRoutes"
 		v-slot:head
+		v-bind="$attrs"
 	>
 		Принятие решения по документу "{{ document.number }}"
 	</Process>
+	<Participants
+		class="approval-esz__participants"
+		v-if="!hideParticipants"
+	/>
 </template>
 <script setup>
 import { useActiveTab, useDocument } from "@documents/esz/entities/esz";
-import { inject } from "vue";
+import Participants from "./Participants.vue";
 
 const emit = defineEmits(['participantCountChanged']);
 
 const props = defineProps({
 	approvalRoutes: Array,
+	hideParticipants: {
+		type: Boolean,
+		default: false,
+	}
 });
 
 const { setActiveTab } = useActiveTab();
 const { updateDocument, document } = useDocument();
-
 
 /**
  * Обработка события: бизнес-процесс создан
@@ -92,3 +100,8 @@ const onParticipantCountChanged = async (count) => {
 	emit('participantCountChanged', count);
 };
 </script>
+<style scoped lang="scss">
+.approval-esz__participants {
+	margin-top: 1.5rem;
+}
+</style>

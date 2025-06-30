@@ -1,0 +1,1 @@
+export { default as CompletedProcesses } from './CompletedProcesses.vue';

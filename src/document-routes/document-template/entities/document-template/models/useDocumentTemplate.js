@@ -12,7 +12,7 @@ export const useDocumentTemplate = () => {
 	* @param {number} id
 	*/
 	const initDocumentTemplate = async (id) => {
-		try {
+		try {			
 			loading.value = true;
 			documentTemplate.value = await DocumentTemplateRepo.get({ id });
 			documentTemplate.value.requirements = documentTemplate.value.requirements || '';
@@ -43,7 +43,7 @@ export const useDocumentTemplate = () => {
 	* @param {number} route_id
 	*/
 	const initDocumentTemplatesTree = async (route_id) => {
-		try {
+		try {			
 			loading.value = true;
 			documentTemplatesTree.value = await DocumentTemplateRepo.list({ route_id });
 		} catch (e) {

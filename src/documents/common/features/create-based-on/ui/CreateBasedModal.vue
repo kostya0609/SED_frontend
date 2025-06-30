@@ -2,6 +2,7 @@
 	<el-drawer
 		v-model="show"
 		class="based-modal"
+		size="50%"
 	>
 		<template #header>
 			<div class="based-modal__title">Создание документов на основании {{ document.number }}</div>
@@ -21,9 +22,6 @@
 				/>
 
 			</el-checkbox-group>
-
-
-			<el-divider class="based-modal__divider" />
 
 			<el-checkbox-group
 				v-if="documentTypes.length"
@@ -58,8 +56,8 @@
 
 			</el-space>
 
+			{{ checkTmpDocs }}
 		</template>
-
 	</el-drawer>
 </template>
 
@@ -68,6 +66,7 @@ import { computed, ref } from 'vue';
 import { DocumentTypeRepo } from '@documents/common/shared/api';
 import { notify } from "@common/shared/utils";
 import { DocumentTemplateRepo } from '@/documents/common/entities/document-template/shared/api';
+import { DOCUMENT_TYPE } from '@/documents/common/shared/constants';
 
 const show = defineModel('show', { default: false });
 const props = defineProps({
@@ -91,7 +90,12 @@ const disabledCreateButton = computed(() => !checkTmpDocs.value.length && !selec
 const handleOkClick = async () => {
 	show.value = false;
 
-	await props.create(props.document.common_document_id, checkTmpDocs, selectedType);
+	await props.create({
+		common_document_id: props.document.common_document_id,
+		checkTmpDocs,
+		selectedType,
+		documentHierarchyId: props.document.document_hierarchy_id,
+	});
 
 	checkTmpDocs.value = [];
 	selectedType.value = [];
@@ -99,6 +103,9 @@ const handleOkClick = async () => {
 
 try {
 	documentTypes.value = await DocumentTypeRepo.list();
+
+	/** Оставляем только ознакомление */
+	documentTypes.value = documentTypes.value.filter(({ id }) => id === DOCUMENT_TYPE.REVIEW);
 
 	if (props.document.hierarchy.length && props.document.tmp_doc_id) {
 		templates.value = await DocumentTemplateRepo.getTreeTemplates({
@@ -126,6 +133,18 @@ try {
 	&__divider {
 		margin: 14px 0;
 	}
+
+	&__inner {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		gap: 1rem;
+	}
+}
+
+:global(.based-modal .el-drawer__body) {
+	height: 100%;
 }
 
 .checkbox-group {

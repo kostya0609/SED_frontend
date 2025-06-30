@@ -1,6 +1,6 @@
 <template>
 	<RouterLink
-		:to="href"
+		:to="to || href"
 		custom
 		v-slot="{ navigate }"
 	>
@@ -8,6 +8,7 @@
 			:underline="underline"
 			:type="type"
 			@click="navigate"
+			:href="href"
 			v-bind="$attrs"
 		>
 			<slot />
@@ -18,9 +19,14 @@
 <script setup>
 import { RouterLink } from 'vue-router';
 defineProps({
-	href: {
+	to: {
 		type: [String, Object],
-		required: true,
+		required: false,
+	},
+	href: {
+		type: [String],
+		required: false,
+		default: '',
 	},
 	underline: {
 		type: Boolean,

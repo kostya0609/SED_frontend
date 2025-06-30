@@ -5,9 +5,9 @@
 	</div>
 </template>
 <script setup>
+import { useActiveProcess } from '@/plugins/process/common';
 import ActualCompletedProcess from './ActualCompletedProcess.vue';
 import DeprecatedCompletedProcess from './DeprecatedCompletedProcess.vue';
-import { useActiveProcess } from '@/plugins/process/common';
 
 const { activeProcess } = useActiveProcess();
 </script>

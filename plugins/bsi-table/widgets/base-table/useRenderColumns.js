@@ -62,6 +62,10 @@ export const useRenderColumns = () => {
 		let columns = [];
 		columnsComponents.value = slots.default ? getColumns(slots.default()) : [];
 
+		if (columnsComponents.value.length === 1 && columnsComponents.value[0].children.length > 0) {
+			columnsComponents.value = columnsComponents.value[0].children;
+		}
+
 		columns = columnsComponents.value.map((component, index) => {
 			return {
 				...component.props,

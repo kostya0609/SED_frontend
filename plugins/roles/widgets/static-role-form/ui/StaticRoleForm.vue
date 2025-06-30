@@ -146,7 +146,7 @@ const rules = reactive({
   title: { required: true, message: 'Необходимо ввести наименование роли' },
   partition_id: { required: true, message: 'Необходимо выбрать раздел' },
   description: { required: false, message: 'Необходимо ввести описание логики работы роли' },
-  users: { required: true, message: 'Необходимо указать Участников', trigger: 'blur' },
+  users: { required: false, message: 'Необходимо указать Участников', trigger: 'blur' },
 });
 
 const formData = reactive({
@@ -215,7 +215,7 @@ if (props.mode === 'edit') {
   formData.title = title;
   formData.description = description;
   formData.is_active = is_active;
-  formData.users = participants.map(item => item.user)
+  formData.users = participants.map(item => item.user);
 };
 
 await initPartitionsTree();

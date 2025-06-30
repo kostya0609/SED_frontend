@@ -14,9 +14,9 @@
 			:user-id="getUserId()"
 			:access="processAccesses"
 			module-name="SEDReview"
-			:is-debug="checkUserRights('full_access')"
+			:is-debug="checkUserRights('dev_access')"
+			show-completed-processes
 		>
-
 			<h3 class="header_h3">
 				{{ document.number }}, статус - {{ document.status.title }}.
 			</h3>
@@ -75,9 +75,16 @@
 					name="hierarchy"
 					lazy
 				>
-					<Hierarchy
-						:hierarchyTree="document.hierarchy"
-						:document_id="document.common_document_id"
+					<template v-if="checkUserRights('dev_access')">
+						<Hierarchy
+							:hierarchyTree="document.hierarchy"
+							:document_id="document.common_document_id"
+						/>
+						<el-divider />
+					</template>
+					<DocumentsHierarchy
+						:hierarchyTree="document.documents_hierarchy"
+						:document_id="document.document_hierarchy_id"
 					/>
 				</el-tab-pane>
 				<el-tab-pane
@@ -109,6 +116,7 @@ import { Description } from "@documents/review/widgets/description";
 import { ApprovalReview } from "@documents/review/widgets/approval-review";
 import { AdditionalInfo } from "@documents/review/widgets/additional-info";
 import { Hierarchy } from "@documents/common/widgets/hierarchy";
+import { DocumentsHierarchy } from "@documents/common/widgets/documents-hierarchy";
 import { ChangeDataButton } from '@documents/review/features/change-data';
 import { SendToApprovalButton } from '@documents/review/features/send-to-approval';
 import { DocumentCancelButton } from '@documents/review/features/document-cancel';
